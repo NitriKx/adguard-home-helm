@@ -1,0 +1,102 @@
+suite: test default configuration
+templates:
+  - deployment.yaml
+tests:
+  - it: should render deployment with default values
+    set:
+      image.tag: "v0.107.43"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: adguard/adguardhome:v0.107.43
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 80
+      - equal:
+          path: spec.template.spec.containers[0].ports[1].containerPort
+          value: 443
+      - equal:
+          path: spec.template.spec.containers[0].ports[2].containerPort
+          value: 53
+      - equal:
+          path: spec.template.spec.containers[0].ports[3].containerPort
+          value: 53
+      - equal:
+          path: spec.template.spec.containers[0].ports[4].containerPort
+          value: 853
+
+---
+suite: test default service configuration
+templates:
+  - service.yaml
+tests:
+  - it: should render service with default values
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.ports[0].port
+          value: 80
+      - equal:
+          path: spec.ports[1].port
+          value: 443
+      - equal:
+          path: spec.ports[2].port
+          value: 53
+      - equal:
+          path: spec.ports[3].port
+          value: 53
+      - equal:
+          path: spec.ports[4].port
+          value: 853
+
+---
+suite: test default PVC configuration
+templates:
+  - pvc.yaml
+tests:
+  - it: should render config PVC with default values
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+      - equal:
+          path: spec.resources.requests.storage
+          value: 1Gi
+      - notExists:
+          path: spec.volumeName
+
+  - it: should render work PVC with default values
+    documentIndex: 1
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+      - equal:
+          path: spec.resources.requests.storage
+          value: 1Gi
+      - notExists:
+          path: spec.volumeName
+
+---
+suite: test default ingress configuration
+templates:
+  - ingress.yaml
+tests:
+  - it: should not render ingress by default
+    asserts:
+      - hasDocuments:
+          count: 0

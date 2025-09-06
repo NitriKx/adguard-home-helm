@@ -1,0 +1,78 @@
+suite: test persistence with volume names
+templates:
+  - pvc.yaml
+tests:
+  - it: should create config PVC with volume name
+    set:
+      persistence.enabled: true
+      persistence.config.volumeName: "pre-allocated-config-volume"
+      persistence.work.volumeName: "pre-allocated-work-volume"
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: spec.volumeName
+          value: pre-allocated-config-volume
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+      - equal:
+          path: spec.resources.requests.storage
+          value: 1Gi
+
+  - it: should create work PVC with volume name
+    set:
+      persistence.enabled: true
+      persistence.work.volumeName: "work-volume"
+    documentIndex: 1
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: spec.volumeName
+          value: work-volume
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+      - equal:
+          path: spec.resources.requests.storage
+          value: 1Gi
+
+  - it: should create config PVC with volume name
+    set:
+      persistence.enabled: true
+      persistence.config.volumeName: "config-volume"
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: spec.volumeName
+          value: config-volume
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+      - equal:
+          path: spec.resources.requests.storage
+          value: 1Gi
+
+  - it: should create PVC with custom storage class and size
+    set:
+      persistence.enabled: true
+      persistence.config.storageClass: "fast-ssd"
+      persistence.config.size: "5Gi"
+      persistence.config.accessMode: "ReadWriteMany"
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: spec.storageClassName
+          value: fast-ssd
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteMany
+      - equal:
+          path: spec.resources.requests.storage
+          value: 5Gi

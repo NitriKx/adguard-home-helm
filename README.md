@@ -8,7 +8,7 @@ A Helm chart for deploying [AdGuard Home](https://adguard.com/en/adguard-home/ov
 ## Prerequisites
 
 - Kubernetes 1.20+
-- Helm 3.0+
+- Helm 3.0+ with [unittest plugin](https://github.com/helm-unittest/helm-unittest)
 - [Task](https://taskfile.dev/) (optional, for development workflow automation)
 - [pre-commit](https://pre-commit.com/) (optional, for automated code quality checks)
 
@@ -256,6 +256,53 @@ task install
 
 # Uninstall the chart
 task uninstall
+```
+
+## Testing
+
+This chart includes comprehensive unit tests using the [Helm unittest plugin](https://github.com/helm-unittest/helm-unittest). The tests validate different configurations and ensure the chart works correctly.
+
+### Running Tests
+
+```bash
+# Run all tests
+helm unittest charts/adguard-home
+
+# Run specific test file
+helm unittest charts/adguard-home --file default_test.yaml
+
+# Run with verbose output
+helm unittest charts/adguard-home -v
+```
+
+### Test Coverage
+
+The test suite covers:
+
+- **Default Configuration**: Validates basic deployment, service, and PVC creation
+- **Persistence**: Tests both PVC creation and existing PVC usage scenarios
+- **Volume Names**: Validates volume name specification for PVCs
+- **Ingress**: Tests ingress creation with various configurations
+- **Service**: Validates different service types and configurations
+- **Resources**: Ensures resource specifications work correctly
+- **Extra Manifests**: Tests additional Kubernetes resource deployment
+
+### Test Structure
+
+Tests are located in `charts/adguard-home/tests/` and follow the Helm unittest format:
+
+```yaml
+suite: test name
+templates:
+  - template.yaml
+tests:
+  - it: should do something
+    set:
+      key: value
+    asserts:
+      - equal:
+          path: spec.field
+          value: expected
 ```
 
 ## Contributing
