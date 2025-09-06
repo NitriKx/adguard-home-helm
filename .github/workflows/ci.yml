@@ -1,0 +1,157 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-test:
+    name: Lint and Test Helm Chart
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        kubernetes-version: ["1.20.15", "1.21.14", "1.22.17", "1.23.17", "1.24.16", "1.25.12", "1.26.7", "1.27.4"]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.12.0
+
+    - name: Setup helm-unittest plugin
+      run: |
+        helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v0.3.4
+
+    - name: Cache Helm dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/Library/Caches/helm/repository
+        key: ${{ runner.os }}-helm-${{ hashFiles('**/Chart.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-helm-
+
+    - name: Run Helm lint
+      run: |
+        echo "🔍 Running Helm lint..."
+        helm lint charts/adguard-home
+
+    - name: Run Helm unit tests
+      run: |
+        echo "🧪 Running Helm unit tests..."
+        helm unittest charts/adguard-home
+
+    - name: Test chart templating
+      run: |
+        echo "📋 Testing chart templating..."
+        helm template test charts/adguard-home > /dev/null
+
+    - name: Test chart templating with custom values
+      run: |
+        echo "📋 Testing chart templating with custom values..."
+        helm template test charts/adguard-home \
+          --set adguardHome.timezone="America/New_York" \
+          --set persistence.enabled=true \
+          --set ingress.enabled=true \
+          --set healthCheck.enabled=true > /dev/null
+
+    - name: Test chart templating with config YAML
+      run: |
+        echo "📋 Testing chart templating with custom config..."
+        helm template test charts/adguard-home \
+          --set 'adguardHome.configYaml=bind_host: 0.0.0.0' > /dev/null
+
+    - name: Test Kubernetes version compatibility
+      run: |
+        echo "🔧 Testing Kubernetes ${{ matrix.kubernetes-version }} compatibility..."
+        helm template test charts/adguard-home --kube-version ${{ matrix.kubernetes-version }} > /dev/null
+        echo "✅ Compatible with Kubernetes ${{ matrix.kubernetes-version }}"
+
+    - name: Package chart
+      run: |
+        echo "📦 Packaging Helm chart..."
+        helm package charts/adguard-home
+
+    - name: Validate packaged chart
+      run: |
+        echo "🔍 Validating packaged chart..."
+        helm lint adguard-home-*.tgz
+        rm adguard-home-*.tgz
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        scan-ref: './charts/adguard-home'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [lint-and-test, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.12.0
+
+    - name: Package and release chart
+      run: |
+        echo "📦 Creating release package..."
+        helm package charts/adguard-home
+
+        echo "📋 Chart information:"
+        helm show chart adguard-home-*.tgz
+
+        # Here you could add steps to upload to a Helm repository
+        # or create a GitHub release with the chart package
+
+    - name: Create GitHub release
+      if: success()
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: chart-${{ github.run_number }}
+        release_name: Chart Release ${{ github.run_number }}
+        body: |
+          Automated Helm chart release
+
+          ## Changes
+          - Automated release from CI pipeline
+          - All tests passed
+          - Security scan completed
+
+          ## Chart Package
+          - Includes packaged Helm chart
+          - Ready for deployment
+        draft: false
+        prerelease: false

@@ -3,7 +3,9 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Helm](https://img.shields.io/badge/Helm-3-blue.svg)](https://helm.sh/)
 
-A Helm chart for deploying [AdGuard Home](https://adguard.com/en/adguard-home/overview.html) - a network-wide ad and tracker blocking DNS server.
+A Helm chart for deploying [AdGuard Home](https://adguard.com/en-adguard-home/overview.html) - a network-wide ad and tracker blocking DNS server.
+
+[![CI](https://github.com/your-username/adguard-home-helm/workflows/CI/badge.svg)](https://github.com/your-username/adguard-home-helm/actions)
 
 ## Prerequisites
 
@@ -404,9 +406,50 @@ tests:
           value: expected
 ```
 
+## CI/CD
+
+This repository includes GitHub Actions workflows for automated testing and validation:
+
+### Workflows
+
+- **CI** (`ci.yml`): Comprehensive pipeline for main branch
+  - Runs on pushes to `main` and pull requests
+  - Tests against multiple Kubernetes versions (1.20-1.27)
+  - Includes security scanning with Trivy
+  - Automated chart packaging and release
+
+- **PR Validation** (`pr-validation.yml`): Fast feedback for pull requests
+  - Runs on pull requests targeting `main`
+  - Quick validation of changes
+  - Focuses on critical checks for faster feedback
+
+### CI Pipeline Features
+
+- **Multi-Kubernetes Testing**: Validates compatibility across K8s versions
+- **Security Scanning**: Automated vulnerability scanning with Trivy
+- **Automated Releases**: Chart packaging and GitHub releases
+- **Comprehensive Testing**: Unit tests, linting, templating validation
+
+### Local Development
+
+For local development, you can run the same checks using the Taskfile:
+
+```bash
+# Run linting
+task lint
+
+# Run tests
+helm unittest charts/adguard-home
+
+# Package chart
+task package
+```
+
 ## Contributing
 
 Contributions are welcome! Please feel free to submit issues and pull requests.
+
+**Note**: All pull requests must pass the CI pipeline before merging.
 
 ## License
 
