@@ -1,0 +1,188 @@
+suite: test default configuration
+templates:
+  - deployment.yaml
+tests:
+  - it: should render deployment with default values
+    set:
+      image.tag: "v0.107.43"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: adguard/adguardhome:v0.107.43
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 80
+      - equal:
+          path: spec.template.spec.containers[0].ports[1].containerPort
+          value: 443
+      - equal:
+          path: spec.template.spec.containers[0].ports[2].containerPort
+          value: 443
+      - equal:
+          path: spec.template.spec.containers[0].ports[3].containerPort
+          value: 3000
+      - equal:
+          path: spec.template.spec.containers[0].ports[4].containerPort
+          value: 53
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.port
+          value: http
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+          value: 5
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.path
+          value: /
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.port
+          value: http
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+          value: 30
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: TZ
+      - equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: UTC
+
+---
+suite: test default service configuration
+templates:
+  - service.yaml
+tests:
+  - it: should render DNS service with default values
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.type
+          value: LoadBalancer
+      - equal:
+          path: spec.ports[0].port
+          value: 53
+      - equal:
+          path: spec.ports[1].port
+          value: 53
+
+---
+suite: test default PVC configuration
+templates:
+  - pvc.yaml
+tests:
+  - it: should render config PVC with default values
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+      - equal:
+          path: spec.resources.requests.storage
+          value: 5Gi
+      - notExists:
+          path: spec.volumeName
+
+  - it: should render work PVC with default values
+    documentIndex: 1
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+      - equal:
+          path: spec.resources.requests.storage
+          value: 1Gi
+      - notExists:
+          path: spec.volumeName
+
+---
+suite: test default ingress configuration
+templates:
+  - ingress.yaml
+tests:
+  - it: should not render ingress by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+---
+suite: test health checks disabled
+templates:
+  - deployment.yaml
+tests:
+  - it: should not include probes when health checks are disabled
+    set:
+      healthCheck.enabled: false
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
+
+---
+suite: test custom timezone configuration
+templates:
+  - deployment.yaml
+tests:
+  - it: should use custom timezone when configured
+    set:
+      adguardHome.timezone: "America/New_York"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: TZ
+      - equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: America/New_York
+
+---
+suite: test AdGuard Home config YAML
+templates:
+  - deployment.yaml
+tests:
+  - it: should not create init container when configYaml is not specified
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.spec.initContainers
+
+  - it: should create init container when configYaml is specified
+    set:
+      adguardHome:
+        configYaml: |
+          bind_host: 0.0.0.0
+          bind_port: 80
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: adguard-home-config
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: busybox:1.36
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].name
+          value: config
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].mountPath
+          value: /opt/adguardhome/conf

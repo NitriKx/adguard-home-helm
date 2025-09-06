@@ -1,0 +1,82 @@
+suite: test persistence with existing PVCs
+templates:
+  - pvc.yaml
+tests:
+  - it: should not create PVCs when existing claims are specified
+    set:
+      persistence.enabled: true
+      persistence.config.existingClaim: "my-config-pvc"
+      persistence.work.existingClaim: "my-work-pvc"
+    asserts:
+      - hasDocuments:
+          count: 0
+
+---
+suite: test deployment with existing PVCs
+templates:
+  - deployment.yaml
+tests:
+  - it: should use existing PVC names in deployment
+    set:
+      persistence.enabled: true
+      persistence.config.existingClaim: "my-config-pvc"
+      persistence.work.existingClaim: "my-work-pvc"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+          value: my-config-pvc
+      - equal:
+          path: spec.template.spec.volumes[1].persistentVolumeClaim.claimName
+          value: my-work-pvc
+
+---
+suite: test partial existing PVCs - config only
+templates:
+  - pvc.yaml
+tests:
+  - it: should create work PVC when only config has existing claim
+    set:
+      persistence.enabled: true
+      persistence.config.existingClaim: "my-config-pvc"
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-work
+      - notExists:
+          path: spec.volumeName
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+      - equal:
+          path: spec.resources.requests.storage
+          value: 1Gi
+
+---
+suite: test partial existing PVCs - work only
+templates:
+  - pvc.yaml
+tests:
+  - it: should create config PVC when only work has existing claim
+    set:
+      persistence.enabled: true
+      persistence.work.existingClaim: "my-work-pvc"
+    documentIndex: 0
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-config
+      - notExists:
+          path: spec.volumeName
+      - equal:
+          path: spec.accessModes[0]
+          value: ReadWriteOnce
+      - equal:
+          path: spec.resources.requests.storage
+          value: 5Gi

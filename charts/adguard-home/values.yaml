@@ -1,0 +1,347 @@
+# Default values for adguard-home.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# AdGuard Home configuration
+adguardHome:
+  # Timezone for the container
+  timezone: UTC
+  # Optional AdGuard Home configuration YAML
+  # configYaml: |
+  #   bind_host: 0.0.0.0
+  #   bind_port: 80
+  #   beta_bind_port: 3000
+  #   users: []
+  #   auth_attempts: 5
+  #   block_auth_min: 15
+  #   http_proxy: ""
+  #   language: ""
+  #   debug_pprof: false
+  #   web_session_ttl: 720
+  #   dns:
+  #     bind_hosts:
+  #       - 0.0.0.0
+  #     port: 53
+  #     anonymize_client_ip: false
+  #     ratelimit: 20
+  #     ratelimit_subnet_len_ipv4: 24
+  #     ratelimit_subnet_len_ipv6: 56
+  #     ratelimit_whitelist: []
+  #     refuse_any: true
+  #     upstream_dns:
+  #       - https://dns10.quad9.net/dns-query
+  #     upstream_dns_file: ""
+  #     bootstrap_dns:
+  #       - 9.9.9.10
+  #       - 149.112.112.10
+  #       - 2620:fe::10
+  #       - 2620:fe::fe:10
+  #     fallback_dns: []
+  #     local_ptr_upstreams: []
+  #     use_private_ptr_resolvers: true
+  #     resolve_clients: true
+  #     local_client_sync: false
+  #     all_servers: false
+  #     fastest_addr: false
+  #     fastest_timeout: 1s
+  #     allowed_clients: []
+  #     disallowed_clients: []
+  #     blocked_hosts: []
+  #     trusted_proxies:
+  #       - 127.0.0.0/8
+  #       - ::1/128
+  #     cache_size: 4194304
+  #     cache_ttl_min: 0
+  #     cache_ttl_max: 0
+  #     cache_optimistic: false
+  #     bogus_nxdomain: []
+  #     aaaa_disabled: false
+  #     enable_dnssec: false
+  #     edns_client_subnet: false
+  #     max_goroutines: 300
+  #     handle_ddr: true
+  #     ipset: []
+  #     filtering_enabled: true
+  #     filters_update_interval: 24
+  #     parental_enabled: false
+  #     safebrowsing_enabled: false
+  #     safebrowsing_cache_size: 1048576
+  #     safesearch_enabled: false
+  #     querylog_enabled: true
+  #     querylog_file_enabled: true
+  #     querylog_interval: 168h
+  #     querylog_size_memory: 1000
+  #     anonymize_client_ip: false
+  #     protection_enabled: true
+  #     dhcp:
+  #       enabled: false
+  #       interface_name: ""
+  #       dhcpv4:
+  #         gateway_ip: ""
+  #         subnet_mask: ""
+  #         range_start: ""
+  #         range_end: ""
+  #         lease_duration: 86400
+  #         icmp_timeout_msec: 1000
+  #         options: []
+  #       dhcpv6:
+  #         range_start: ""
+  #         lease_duration: 86400
+  #         options: []
+  #     tls:
+  #       enabled: false
+  #       server_name: ""
+  #       force_https: false
+  #       port_https: 443
+  #       port_dns_over_tls: 853
+  #       port_dns_over_quic: 784
+  #       port_dnscrypt: 0
+  #       allow_unencrypted_doh: false
+  #       strict_sni_check: false
+  #       certificate_path: ""
+  #       private_key_path: ""
+  #       certificate_chain: ""
+  #       private_key: ""
+  #       pki_path: ""
+  #     filters:
+  #       - enabled: true
+  #         url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+  #         name: AdGuard DNS filter
+  #         id: 1
+  #     whitelist_filters: []
+  #     user_rules: []
+  #     dhcp:
+  #       enabled: false
+  #       interface_name: ""
+  #       dhcpv4:
+  #         gateway_ip: ""
+  #         subnet_mask: ""
+  #         range_start: ""
+  #         range_end: ""
+  #         lease_duration: 86400
+  #         icmp_timeout_msec: 1000
+  #         options: []
+  #       dhcpv6:
+  #         range_start: ""
+  #         lease_duration: 86400
+  #         options: []
+  #     client_settings: []
+
+# Docker image configuration
+image:
+  repository: adguard/adguardhome
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# Service configurations
+services:
+  # DNS service (port 53/tcp and 53/udp)
+  dns:
+    enabled: true
+    type: LoadBalancer
+    annotations: {}
+    labels: {}
+    ports:
+      dns:
+        port: 53
+        targetPort: 53
+        protocol: UDP
+      dns-tcp:
+        port: 53
+        targetPort: 53
+        protocol: TCP
+
+  # DHCP service (ports 67/udp, 68/tcp and 68/udp)
+  dhcp:
+    enabled: true
+    type: LoadBalancer
+    annotations: {}
+    labels: {}
+    ports:
+      dhcp-server:
+        port: 67
+        targetPort: 67
+        protocol: UDP
+      dhcp-client-tcp:
+        port: 68
+        targetPort: 68
+        protocol: TCP
+      dhcp-client-udp:
+        port: 68
+        targetPort: 68
+        protocol: UDP
+
+  # Admin service (ports 80/tcp, 443/tcp, 443/udp, 3000/tcp)
+  admin:
+    enabled: true
+    type: ClusterIP
+    annotations: {}
+    labels: {}
+    ports:
+      http:
+        port: 80
+        targetPort: 80
+        protocol: TCP
+      https:
+        port: 443
+        targetPort: 443
+        protocol: TCP
+      https-udp:
+        port: 443
+        targetPort: 443
+        protocol: UDP
+      http-beta:
+        port: 3000
+        targetPort: 3000
+        protocol: TCP
+
+  # DNS over TLS service (port 853/tcp)
+  dnsOverTLS:
+    enabled: true
+    type: LoadBalancer
+    annotations: {}
+    labels: {}
+    ports:
+      dns-tls:
+        port: 853
+        targetPort: 853
+        protocol: TCP
+
+  # DNS over QUIC service (ports 784/udp, 853/udp and 8853/udp)
+  dnsOverQUIC:
+    enabled: true
+    type: LoadBalancer
+    annotations: {}
+    labels: {}
+    ports:
+      dns-quic-784:
+        port: 784
+        targetPort: 784
+        protocol: UDP
+      dns-quic-853:
+        port: 853
+        targetPort: 853
+        protocol: UDP
+      dns-quic-8853:
+        port: 8853
+        targetPort: 8853
+        protocol: UDP
+
+  # DNSCrypt service (ports 5443/tcp and 5443/udp)
+  dnsCrypt:
+    enabled: true
+    type: LoadBalancer
+    annotations: {}
+    labels: {}
+    ports:
+      dnscrypt-tcp:
+        port: 5443
+        targetPort: 5443
+        protocol: TCP
+      dnscrypt-udp:
+        port: 5443
+        targetPort: 5443
+        protocol: UDP
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: adguard-home.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: adguard-home-tls
+  #    hosts:
+  #      - adguard-home.local
+
+# Persistence configuration
+persistence:
+  enabled: true
+  config:
+    enabled: true
+    size: 5Gi
+    accessModes:
+      - ReadWriteOnce
+    # existingClaim: ""
+    storageClass: ""
+  work:
+    enabled: true
+    size: 1Gi
+    accessModes:
+      - ReadWriteOnce
+    # existingClaim: ""
+    storageClass: ""
+
+# Health check configuration
+healthCheck:
+  enabled: true
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  livenessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  startupProbe:
+    enabled: false
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 30
+    successThreshold: 1
+
+# Security context
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+      - ALL
+
+# Resources
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}
+
+# Extra environment variables
+extraEnvVars: []
+
+# Extra volumes
+extraVolumes: []
+
+# Extra volume mounts
+extraVolumeMounts: []
