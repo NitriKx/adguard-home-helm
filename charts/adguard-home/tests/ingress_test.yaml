@@ -1,0 +1,114 @@
+suite: test ingress configuration
+templates:
+  - ingress.yaml
+tests:
+  - it: should not render ingress by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render ingress with default configuration
+    set:
+      ingress.enabled: true
+      ingress.hosts:
+        - host: adguard-home.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+      - equal:
+          path: apiVersion
+          value: networking.k8s.io/v1
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home
+      - equal:
+          path: spec.rules[0].host
+          value: adguard-home.example.com
+      - equal:
+          path: spec.rules[0].http.paths[0].path
+          value: /
+      - equal:
+          path: spec.rules[0].http.paths[0].pathType
+          value: Prefix
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.port.number
+          value: 80
+
+  - it: should render ingress with TLS configuration
+    set:
+      ingress.enabled: true
+      ingress.hosts:
+        - host: adguard-home.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+      ingress.tls:
+        - secretName: adguard-home-tls
+          hosts:
+            - adguard-home.example.com
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+      - equal:
+          path: spec.tls[0].secretName
+          value: adguard-home-tls
+      - equal:
+          path: spec.tls[0].hosts[0]
+          value: adguard-home.example.com
+
+  - it: should render ingress with custom class name
+    set:
+      ingress.enabled: true
+      ingress.className: "nginx"
+      ingress.hosts:
+        - host: adguard-home.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+      - equal:
+          path: spec.ingressClassName
+          value: nginx
+
+  - it: should render ingress with multiple hosts and paths
+    set:
+      ingress.enabled: true
+      ingress.hosts:
+        - host: adguard-home.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+            - path: /api
+              pathType: Prefix
+        - host: admin.adguard-home.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: Ingress
+      - equal:
+          path: spec.rules[0].host
+          value: adguard-home.example.com
+      - equal:
+          path: spec.rules[0].http.paths[0].path
+          value: /
+      - equal:
+          path: spec.rules[0].http.paths[1].path
+          value: /api
+      - equal:
+          path: spec.rules[1].host
+          value: admin.adguard-home.example.com

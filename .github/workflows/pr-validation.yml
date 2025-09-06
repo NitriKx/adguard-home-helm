@@ -1,0 +1,62 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'charts/adguard-home/**'
+      - '.github/workflows/**'
+
+jobs:
+  validate-pr:
+    name: Validate Pull Request
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.12.0
+
+    - name: Setup helm-unittest plugin
+      run: |
+        helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v0.3.4
+
+    - name: Run Helm lint
+      run: |
+        echo "🔍 Running Helm lint..."
+        helm lint charts/adguard-home
+
+    - name: Run Helm unit tests
+      run: |
+        echo "🧪 Running Helm unit tests..."
+        helm unittest charts/adguard-home
+
+    - name: Test basic templating
+      run: |
+        echo "📋 Testing basic chart templating..."
+        helm template test charts/adguard-home > /dev/null
+
+    - name: Test advanced templating
+      run: |
+        echo "📋 Testing advanced chart templating..."
+        helm template test charts/adguard-home \
+          --set ingress.enabled=true \
+          --set persistence.enabled=true \
+          --set 'adguardHome.configYaml=bind_host: 0.0.0.0' > /dev/null
+
+    - name: Test Kubernetes version compatibility
+      run: |
+        echo "🔧 Testing Kubernetes version compatibility..."
+        helm template test charts/adguard-home --kube-version 1.20.15 > /dev/null
+        helm template test charts/adguard-home --kube-version 1.25.12 > /dev/null
+        echo "✅ Compatible with tested Kubernetes versions"
+
+    - name: Package validation
+      run: |
+        echo "📦 Testing chart packaging..."
+        helm package charts/adguard-home > /dev/null
+        echo "✅ Chart packaging successful"

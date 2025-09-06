@@ -1,0 +1,45 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        files: \.(yaml|yml)$
+      - id: end-of-file-fixer
+        files: \.(yaml|yml)$
+      - id: check-yaml
+        files: \.(yaml|yml)$
+        exclude: ^charts/.*templates/
+        args: [--allow-multiple-documents]
+      - id: check-merge-conflict
+      - id: check-added-large-files
+
+  - repo: https://github.com/norwoodj/helm-docs
+    rev: v1.14.2
+    hooks:
+      - id: helm-docs
+        args:
+          - --chart-search-root=charts
+          - --template-files=README.md.gotmpl
+
+  - repo: local
+    hooks:
+      - id: helm-lint
+        name: Helm Lint
+        entry: bash -c 'helm lint charts/adguard-home'
+        language: system
+        files: ^charts/adguard-home/
+        pass_filenames: false
+
+      - id: helm-template
+        name: Helm Template Validation
+        entry: bash -c 'helm template test charts/adguard-home > /dev/null'
+        language: system
+        files: ^charts/adguard-home/
+        pass_filenames: false
+
+      - id: helm-dependency
+        name: Helm Dependency Check
+        entry: bash -c 'helm dependency list charts/adguard-home'
+        language: system
+        files: ^charts/adguard-home/Chart\.yaml$
+        pass_filenames: false
