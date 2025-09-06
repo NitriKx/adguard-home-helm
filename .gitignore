@@ -14,6 +14,10 @@
 # Helm
 *.tgz
 
+# Chart Releaser
+.cr-release-packages/
+.cr-index/
+
 # OS generated files
 .DS_Store
 Thumbs.db

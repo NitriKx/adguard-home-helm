@@ -16,13 +16,20 @@ A Helm chart for deploying [AdGuard Home](https://adguard.com/en-adguard-home/ov
 
 ## Installing the Chart
 
-To install the chart with the release name `adguard-home`:
+### From Helm Repository (Recommended)
+
+Add the Helm repository and install the chart:
 
 ```bash
-helm repo add adguard-home https://your-repo-url/charts
+# Add the repository
+helm repo add nitrikx https://nitrikx.github.io/adguard-home-helm
 helm repo update
-helm install adguard-home adguard-home/adguard-home
+
+# Install the chart
+helm install adguard-home nitrikx/adguard-home
 ```
+
+### From Local Directory
 
 Alternatively, you can install the chart directly from this repository:
 
@@ -416,7 +423,7 @@ This repository includes GitHub Actions workflows for automated testing and vali
   - Runs on pushes to `main` and pull requests
   - Tests against Kubernetes versions 1.20.15 and 1.25.12
   - Includes security scanning with Trivy
-  - Automated chart packaging and release
+  - Automated chart release with chart-releaser
 
 - **PR Validation** (`pr-validation.yml`): Fast feedback for pull requests
   - Runs on pull requests targeting `main`
@@ -427,7 +434,8 @@ This repository includes GitHub Actions workflows for automated testing and vali
 
 - **Kubernetes Compatibility**: Validates compatibility with K8s 1.20.15 and 1.25.12
 - **Security Scanning**: Automated vulnerability scanning with Trivy
-- **Automated Releases**: Chart packaging and GitHub releases
+- **Automated Releases**: Chart release with chart-releaser
+- **Helm Repository**: Hosted on GitHub Pages
 - **Comprehensive Testing**: Unit tests, linting, templating validation
 
 ### Local Development

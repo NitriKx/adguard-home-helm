@@ -74,16 +74,10 @@ jobs:
         helm template test charts/adguard-home --kube-version ${{ matrix.kubernetes-version }} > /dev/null
         echo "✅ Compatible with Kubernetes ${{ matrix.kubernetes-version }}"
 
-    - name: Package chart
+    - name: Validate chart
       run: |
-        echo "📦 Packaging Helm chart..."
-        helm package charts/adguard-home
-
-    - name: Validate packaged chart
-      run: |
-        echo "🔍 Validating packaged chart..."
-        helm lint adguard-home-*.tgz
-        rm adguard-home-*.tgz
+        echo "🔍 Validating chart..."
+        helm lint charts/adguard-home
 
   security-scan:
     name: Security Scan
@@ -109,7 +103,7 @@ jobs:
         sarif_file: 'trivy-results.sarif'
 
   release:
-    name: Release
+    name: Release Charts
     runs-on: ubuntu-latest
     needs: [lint-and-test, security-scan]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -117,41 +111,22 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
-    - name: Setup Helm
+    - name: Configure Git
+      run: |
+        git config user.name "$GITHUB_ACTOR"
+        git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+    - name: Install Helm
       uses: azure/setup-helm@v3
       with:
         version: v3.12.0
 
-    - name: Package and release chart
-      run: |
-        echo "📦 Creating release package..."
-        helm package charts/adguard-home
-
-        echo "📋 Chart information:"
-        helm show chart adguard-home-*.tgz
-
-        # Here you could add steps to upload to a Helm repository
-        # or create a GitHub release with the chart package
-
-    - name: Create GitHub release
-      if: success()
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Run chart-releaser
+      uses: helm/chart-releaser-action@v1.6.0
       with:
-        tag_name: chart-${{ github.run_number }}
-        release_name: Chart Release ${{ github.run_number }}
-        body: |
-          Automated Helm chart release
-
-          ## Changes
-          - Automated release from CI pipeline
-          - All tests passed
-          - Security scan completed
-
-          ## Chart Package
-          - Includes packaged Helm chart
-          - Ready for deployment
-        draft: false
-        prerelease: false
+        charts_repo_url: https://NitriKx.github.io/adguard-home-helm
+      env:
+        CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
