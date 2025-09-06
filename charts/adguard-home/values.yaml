@@ -229,3 +229,23 @@ extraVolumes: []
 #   - name: config-volume
 #     mountPath: /opt/adguardhome/custom
 extraVolumeMounts: []
+
+# Additional Kubernetes manifests to deploy alongside the chart
+# These will be rendered as separate YAML documents
+# Example:
+# extraManifests:
+#   - apiVersion: v1
+#     kind: ConfigMap
+#     metadata:
+#       name: {{ include "adguard-home.fullname" . }}-extra-config
+#     data:
+#       config.yaml: |
+#         key: value
+#   - apiVersion: v1
+#     kind: Secret
+#     metadata:
+#       name: {{ include "adguard-home.fullname" . }}-extra-secret
+#     type: Opaque
+#     data:
+#       key: dmFsdWU=  # base64 encoded
+extraManifests: []
