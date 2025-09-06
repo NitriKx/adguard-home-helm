@@ -29,6 +29,24 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].ports[4].containerPort
           value: 853
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+          value: /
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.httpGet.port
+          value: http
+      - equal:
+          path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
+          value: 30
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.path
+          value: /
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.httpGet.port
+          value: http
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+          value: 60
 
 ---
 suite: test default service configuration
@@ -100,3 +118,21 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+---
+suite: test health checks disabled
+templates:
+  - deployment.yaml
+tests:
+  - it: should not include probes when health checks are disabled
+    set:
+      healthCheck.enabled: false
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.spec.containers[0].readinessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].livenessProbe
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe

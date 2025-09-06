@@ -170,6 +170,35 @@ securityContext:
 resources: {}
 
 # =============================================================================
+# Health Checks Configuration
+# =============================================================================
+# Configure readiness and liveness probes for the AdGuard Home container
+healthCheck:
+  enabled: true
+  # Readiness probe configuration
+  readinessProbe:
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  # Liveness probe configuration
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 1
+  # Startup probe configuration (Kubernetes 1.18+)
+  startupProbe:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 30
+    successThreshold: 1
+
+# =============================================================================
 # Scheduling Configuration
 # =============================================================================
 

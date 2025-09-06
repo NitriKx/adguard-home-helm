@@ -52,6 +52,40 @@ spec:
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          {{- if .Values.healthCheck.enabled }}
+          # Readiness probe
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.healthCheck.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthCheck.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthCheck.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.healthCheck.readinessProbe.successThreshold }}
+          # Liveness probe
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.healthCheck.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthCheck.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthCheck.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.healthCheck.livenessProbe.successThreshold }}
+          {{- if and .Values.healthCheck.startupProbe.enabled (.Capabilities.APIVersions.Has "startupProbe") }}
+          # Startup probe (Kubernetes 1.18+)
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.healthCheck.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthCheck.startupProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthCheck.startupProbe.failureThreshold }}
+            successThreshold: {{ .Values.healthCheck.startupProbe.successThreshold }}
+          {{- end }}
+          {{- end }}
           {{- with .Values.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
