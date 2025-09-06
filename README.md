@@ -414,7 +414,7 @@ This repository includes GitHub Actions workflows for automated testing and vali
 
 - **CI** (`ci.yml`): Comprehensive pipeline for main branch
   - Runs on pushes to `main` and pull requests
-  - Tests against multiple Kubernetes versions (1.20-1.27)
+  - Tests against Kubernetes versions 1.20.15 and 1.25.12
   - Includes security scanning with Trivy
   - Automated chart packaging and release
 
@@ -425,7 +425,7 @@ This repository includes GitHub Actions workflows for automated testing and vali
 
 ### CI Pipeline Features
 
-- **Multi-Kubernetes Testing**: Validates compatibility across K8s versions
+- **Kubernetes Compatibility**: Validates compatibility with K8s 1.20.15 and 1.25.12
 - **Security Scanning**: Automated vulnerability scanning with Trivy
 - **Automated Releases**: Chart packaging and GitHub releases
 - **Comprehensive Testing**: Unit tests, linting, templating validation

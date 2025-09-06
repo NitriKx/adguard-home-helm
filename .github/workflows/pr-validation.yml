@@ -51,8 +51,8 @@ jobs:
     - name: Test Kubernetes version compatibility
       run: |
         echo "🔧 Testing Kubernetes version compatibility..."
-        helm template test charts/adguard-home --kube-version 1.20.0 > /dev/null
-        helm template test charts/adguard-home --kube-version 1.25.0 > /dev/null
+        helm template test charts/adguard-home --kube-version 1.20.15 > /dev/null
+        helm template test charts/adguard-home --kube-version 1.25.12 > /dev/null
         echo "✅ Compatible with tested Kubernetes versions"
 
     - name: Package validation
