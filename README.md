@@ -10,6 +10,7 @@ A Helm chart for deploying [AdGuard Home](https://adguard.com/en/adguard-home/ov
 - Kubernetes 1.20+
 - Helm 3.0+
 - [Task](https://taskfile.dev/) (optional, for development workflow automation)
+- [pre-commit](https://pre-commit.com/) (optional, for automated code quality checks)
 
 ## Installing the Chart
 
@@ -203,6 +204,37 @@ kubectl get pvc -l app.kubernetes.io/name=adguard-home
 3. **Storage Issues**: Ensure your storage class has sufficient space
 
 ## Development
+
+### Pre-commit Hooks
+
+This repository includes pre-commit hooks to ensure code quality. The hooks automatically run linting and validation checks before each commit.
+
+#### Setup
+
+**Option 1: Using pre-commit framework (recommended)**
+```bash
+# Install pre-commit
+pip install pre-commit
+
+# Install the pre-commit hooks
+pre-commit install
+
+# Run manually on all files
+pre-commit run --all-files
+```
+
+**Option 2: Git hooks (automatic)**
+The repository includes a `.git/hooks/pre-commit` script that runs automatically on commits.
+
+#### Pre-commit Checks
+
+The hooks perform the following validations:
+- **Helm linting** - Validates chart syntax and best practices
+- **Template rendering** - Ensures templates render without errors
+- **YAML syntax validation** - Checks YAML files for syntax errors
+- **Code formatting** - Ensures consistent formatting
+
+### Development Tasks
 
 This repository includes a [Taskfile](https://taskfile.dev/) for development workflow automation. If you have Task installed, you can use the following commands:
 
