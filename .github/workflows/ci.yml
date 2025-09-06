@@ -119,9 +119,8 @@ jobs:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           # this is a built-in strategy in release-please, see "Action Inputs"
           # for more options
-          release-type: helm
+          release-type: simple
           # optional. customize path to release-please-config.json
           config-file: .github/release-please-config.json
           # optional. customize path to .release-please-manifest.json
           manifest-file: .github/release-please-manifest.json
-          path: charts/adguard-home
