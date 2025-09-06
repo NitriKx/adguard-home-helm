@@ -63,10 +63,10 @@ spec:
       volumes:
         - name: config
           persistentVolumeClaim:
-            claimName: {{ include "adguard-home.fullname" . }}-config
+            claimName: {{ .Values.persistence.config.existingClaim | default (printf "%s-config" (include "adguard-home.fullname" .)) }}
         - name: work
           persistentVolumeClaim:
-            claimName: {{ include "adguard-home.fullname" . }}-work
+            claimName: {{ .Values.persistence.work.existingClaim | default (printf "%s-work" (include "adguard-home.fullname" .)) }}
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

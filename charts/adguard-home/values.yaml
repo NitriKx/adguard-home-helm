@@ -85,18 +85,41 @@ persistence:
   # Enable/disable persistent volume claims
   enabled: true
 
-  # Access mode for the PVC: ReadWriteOnce, ReadOnlyMany, ReadWriteMany
-  accessMode: ReadWriteOnce
+  # Configuration data persistence
+  config:
+    # Use an existing PVC instead of creating a new one
+    # If specified, the PVC creation is skipped and this existing claim is used
+    existingClaim: ""
+    # Volume name to use when creating the PVC (optional)
+    # Leave empty to let Kubernetes assign a volume automatically
+    volumeName: ""
+    # Access mode for the PVC: ReadWriteOnce, ReadOnlyMany, ReadWriteMany
+    accessMode: ReadWriteOnce
+    # Storage size for configuration data
+    size: 1Gi
+    # Storage class name. Leave empty to use cluster default
+    # Examples: "standard", "fast-ssd", "local-storage"
+    storageClass: ""
+    # Additional annotations for the PVC
+    annotations: {}
 
-  # Storage size for configuration and work data
-  size: 1Gi
-
-  # Storage class name. Leave empty to use cluster default
-  # Examples: "standard", "fast-ssd", "local-storage"
-  storageClass: ""
-
-  # Additional annotations for the PVC
-  annotations: {}
+  # Work data persistence
+  work:
+    # Use an existing PVC instead of creating a new one
+    # If specified, the PVC creation is skipped and this existing claim is used
+    existingClaim: ""
+    # Volume name to use when creating the PVC (optional)
+    # Leave empty to let Kubernetes assign a volume automatically
+    volumeName: ""
+    # Access mode for the PVC: ReadWriteOnce, ReadOnlyMany, ReadWriteMany
+    accessMode: ReadWriteOnce
+    # Storage size for work data
+    size: 1Gi
+    # Storage class name. Leave empty to use cluster default
+    # Examples: "standard", "fast-ssd", "local-storage"
+    storageClass: ""
+    # Additional annotations for the PVC
+    annotations: {}
 
 # =============================================================================
 # Security Configuration
