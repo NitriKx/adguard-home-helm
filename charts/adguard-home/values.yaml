@@ -158,19 +158,16 @@ securityContext:
 # Resource Management
 # =============================================================================
 # Configure CPU and memory limits and requests
-resources:
-  # Hard limits for resource usage
-  limits:
-    # Maximum CPU usage (500m = 0.5 CPU cores)
-    cpu: 500m
-    # Maximum memory usage
-    memory: 512Mi
-  # Guaranteed resource allocation
-  requests:
-    # Minimum CPU allocation (100m = 0.1 CPU cores)
-    cpu: 100m
-    # Minimum memory allocation
-    memory: 128Mi
+# Leave empty to use cluster defaults or specify as needed
+# Example:
+# resources:
+#   limits:
+#     cpu: 500m
+#     memory: 512Mi
+#   requests:
+#     cpu: 100m
+#     memory: 128Mi
+resources: {}
 
 # =============================================================================
 # Scheduling Configuration
