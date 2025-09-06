@@ -438,6 +438,28 @@ This repository includes GitHub Actions workflows for automated testing and vali
 - **Semantic Versioning**: Conventional commit-based versioning
 - **Comprehensive Testing**: Unit tests, linting, templating validation
 
+### Dependency Management
+
+This repository uses [Renovate](https://github.com/renovatebot/renovate) for automated dependency updates:
+
+#### Features
+- **Automated Updates**: Docker images, Helm chart dependencies, GitHub Actions
+- **Automerge**: Automatic merging of patch and minor updates
+- **Security**: Vulnerability alerts and updates
+- **Grouping**: Related updates are grouped into single PRs
+- **Scheduling**: Updates run weekly on Mondays before 6 AM UTC
+
+#### Configuration
+- **AdGuard Home Docker Image**: Monitored for updates with dedicated grouping
+- **Helm Chart Dependencies**: Automatic version updates in `Chart.yaml`
+- **GitHub Actions**: Workflow action versions kept current
+- **Major Updates**: Require manual review and approval
+
+#### Automerge Rules
+- ✅ **Patch updates**: Automatically merged
+- ✅ **Minor updates**: Automatically merged
+- ❌ **Major updates**: Require manual review
+
 ### Release Management
 
 This repository uses [release-please](https://github.com/google-github-actions/release-please-action) for automated release management:
