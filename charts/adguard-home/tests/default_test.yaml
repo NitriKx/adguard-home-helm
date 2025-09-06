@@ -160,3 +160,37 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].env[0].value
           value: America/New_York
+
+---
+suite: test AdGuard Home config YAML
+templates:
+  - deployment.yaml
+tests:
+  - it: should not create init container when configYaml is not specified
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.spec.initContainers
+
+  - it: should create init container when configYaml is specified
+    set:
+      adguardHome:
+        configYaml: |
+          bind_host: 0.0.0.0
+          bind_port: 80
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.initContainers[0].name
+          value: adguard-home-config
+      - equal:
+          path: spec.template.spec.initContainers[0].image
+          value: busybox:1.36
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].name
+          value: config
+      - equal:
+          path: spec.template.spec.initContainers[0].volumeMounts[0].mountPath
+          value: /opt/adguardhome/conf

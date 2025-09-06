@@ -18,6 +18,28 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.adguardHome.configYaml }}
+      initContainers:
+        - name: adguard-home-config
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              cat > /opt/adguardhome/conf/AdGuardHome.yaml << 'EOF'
+              {{ .Values.adguardHome.configYaml | indent 14 }}
+              EOF
+          volumeMounts:
+            - name: config
+              mountPath: /opt/adguardhome/conf
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 32Mi
+      {{- end }}
       containers:
         - name: adguard-home
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"

@@ -179,6 +179,27 @@ adguardHome:
   # Examples: "UTC", "America/New_York", "Europe/London", "Asia/Tokyo"
   timezone: "UTC"
 
+  # Custom AdGuard Home configuration YAML
+  # If specified, an init container will write this configuration to AdGuardHome.yaml
+  # This allows full customization of AdGuard Home settings
+  # Example:
+  # configYaml: |
+  #   bind_host: 0.0.0.0
+  #   bind_port: 80
+  #   users:
+  #     - name: admin
+  #       password: $2a$10$...
+  #   dns:
+  #     bind_hosts:
+  #       - 0.0.0.0
+  #     port: 53
+  #     upstream_dns:
+  #       - 8.8.8.8
+  #   filtering:
+  #     protection_enabled: true
+  #     filtering_enabled: true
+  configYaml: ""
+
 # =============================================================================
 # Health Checks Configuration
 # =============================================================================

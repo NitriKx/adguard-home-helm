@@ -70,6 +70,7 @@ The following table lists the configurable parameters of the AdGuard Home chart 
 | `healthCheck.livenessProbe.*` | Liveness probe configuration | See values.yaml |
 | `healthCheck.startupProbe.*` | Startup probe configuration (K8s 1.18+) | See values.yaml |
 | `adguardHome.timezone` | Timezone for AdGuard Home container | `"UTC"` |
+| `adguardHome.configYaml` | Custom AdGuard Home configuration YAML | `""` |
 
 ### AdGuard Home Configuration
 
@@ -90,6 +91,79 @@ adguardHome:
 - `"Europe/London"` - British Summer Time
 - `"Asia/Tokyo"` - Japan Standard Time
 - `"Australia/Sydney"` - Australian Eastern Time
+
+#### Custom Configuration YAML
+
+You can provide a complete AdGuard Home configuration by specifying a custom YAML configuration. When provided, the chart will create an init container that writes your configuration to `AdGuardHome.yaml` on every pod startup.
+
+**Important Notes:**
+- The configuration is written on every pod restart, ensuring your settings are always applied
+- The init container uses a lightweight BusyBox image
+- Only specify this if you need full control over AdGuard Home configuration
+
+**Basic Configuration Example:**
+```yaml
+adguardHome:
+  configYaml: |
+    bind_host: 0.0.0.0
+    bind_port: 80
+    dns:
+      bind_hosts:
+        - 0.0.0.0
+      port: 53
+      upstream_dns:
+        - 8.8.8.8
+        - 1.1.1.1
+    filtering:
+      protection_enabled: true
+      filtering_enabled: true
+```
+
+**Advanced Configuration with Authentication:**
+```yaml
+adguardHome:
+  configYaml: |
+    bind_host: 0.0.0.0
+    bind_port: 80
+    users:
+      - name: admin
+        password: $2a$10$example.hash.here
+    dns:
+      bind_hosts:
+        - 0.0.0.0
+      port: 53
+      upstream_dns:
+        - https://dns.google/dns-query
+        - https://cloudflare-dns.com/dns-query
+      bootstrap_dns:
+        - 8.8.8.8
+        - 1.1.1.1
+    filtering:
+      protection_enabled: true
+      filtering_enabled: true
+      safe_search:
+        enabled: true
+      parental_control:
+        enabled: false
+    dhcp:
+      enabled: false
+    tls:
+      enabled: true
+      server_name: adguard.example.com
+      force_https: true
+    log:
+      enabled: true
+      file: ""
+      max_backups: 0
+      max_size: 100
+      max_age: 3
+      compress: false
+      local_time: false
+      verbose: false
+```
+
+**Configuration Reference:**
+For a complete list of available configuration options, refer to the [AdGuard Home Configuration Documentation](https://github.com/AdguardTeam/AdGuardHome/wiki/Configuration).
 
 ### Image Configuration
 
