@@ -1,0 +1,211 @@
+# Default values for AdGuard Home Helm chart
+# This is a YAML-formatted file that declares variables to be passed into Helm templates.
+# Each section contains configuration options for different aspects of the AdGuard Home deployment.
+
+# =============================================================================
+# AdGuard Home Image Configuration
+# =============================================================================
+# Configure the Docker image used for AdGuard Home deployment
+image:
+  # Docker repository for AdGuard Home image
+  repository: adguard/adguardhome
+
+  # Image tag to use. If empty, uses Chart.appVersion from Chart.yaml
+  # Examples: "v0.107.43", "latest", or leave empty for Chart version
+  tag: ""
+
+  # Image pull policy: Always, Never, or IfNotPresent
+  pullPolicy: IfNotPresent
+
+# =============================================================================
+# Service Configuration
+# =============================================================================
+# Configure how AdGuard Home is exposed as a Kubernetes service
+service:
+  # Service type: ClusterIP, NodePort, LoadBalancer, or ExternalName
+  # - ClusterIP: Internal cluster access only
+  # - LoadBalancer: External load balancer (cloud environments)
+  # - NodePort: Access via <NodeIP>:<NodePort>
+  type: ClusterIP
+
+  # HTTP port for web interface (redirects to HTTPS by default)
+  port: 80
+
+  # HTTPS port for secure web interface
+  httpsPort: 443
+
+  # DNS port for standard DNS queries (UDP/TCP)
+  dnsPort: 53
+
+  # DNS over TLS port for encrypted DNS queries
+  dnsTlsPort: 853
+
+  # Additional annotations for the service (e.g., for load balancers)
+  annotations: {}
+
+# =============================================================================
+# Ingress Configuration
+# =============================================================================
+# Configure external access via Kubernetes Ingress
+ingress:
+  # Enable/disable ingress creation
+  enabled: false
+
+  # Ingress class name (e.g., "nginx", "traefik")
+  # Leave empty to use cluster default
+  className: ""
+
+  # Annotations for ingress controller (e.g., cert-manager, auth, etc.)
+  # Example: cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  annotations: {}
+
+  # Host configuration for the ingress
+  hosts:
+    - # Domain name for AdGuard Home
+      host: adguard-home.local
+      # URL paths to expose
+      paths:
+        - # Root path for web interface
+          path: /
+          # Path type: Exact, Prefix, or ImplementationSpecific
+          pathType: Prefix
+
+  # TLS configuration for HTTPS
+  # Example:
+  # - secretName: adguard-home-tls
+  #   hosts:
+  #     - adguard-home.example.com
+  tls: []
+
+# =============================================================================
+# Persistence Configuration
+# =============================================================================
+# Configure persistent storage for AdGuard Home data
+persistence:
+  # Enable/disable persistent volume claims
+  enabled: true
+
+  # Access mode for the PVC: ReadWriteOnce, ReadOnlyMany, ReadWriteMany
+  accessMode: ReadWriteOnce
+
+  # Storage size for configuration and work data
+  size: 1Gi
+
+  # Storage class name. Leave empty to use cluster default
+  # Examples: "standard", "fast-ssd", "local-storage"
+  storageClass: ""
+
+  # Additional annotations for the PVC
+  annotations: {}
+
+# =============================================================================
+# Security Configuration
+# =============================================================================
+# Configure security contexts for pods and containers
+
+# Pod-level security context (applies to all containers in the pod)
+podSecurityContext:
+  # User ID to run the pod as (0 = root, required for DNS functionality)
+  runAsUser: 0
+  # Group ID to run the pod as
+  runAsGroup: 0
+  # File system group ID for volume access
+  fsGroup: 0
+
+# Container-level security context
+securityContext:
+  # Run container in privileged mode (required for DNS port binding)
+  privileged: false
+  # Allow privilege escalation
+  allowPrivilegeEscalation: false
+  # Mount root filesystem as read-only
+  readOnlyRootFilesystem: false
+  # Run as non-root user (set to false for DNS functionality)
+  runAsNonRoot: false
+  # User ID to run container as
+  runAsUser: 0
+  # Group ID to run container as
+  runAsGroup: 0
+  # Linux capabilities to drop (ALL = drop all capabilities)
+  capabilities:
+    drop:
+      - ALL
+
+# =============================================================================
+# Resource Management
+# =============================================================================
+# Configure CPU and memory limits and requests
+resources:
+  # Hard limits for resource usage
+  limits:
+    # Maximum CPU usage (500m = 0.5 CPU cores)
+    cpu: 500m
+    # Maximum memory usage
+    memory: 512Mi
+  # Guaranteed resource allocation
+  requests:
+    # Minimum CPU allocation (100m = 0.1 CPU cores)
+    cpu: 100m
+    # Minimum memory allocation
+    memory: 128Mi
+
+# =============================================================================
+# Scheduling Configuration
+# =============================================================================
+
+# Node selector for pod scheduling (key-value pairs)
+# Example:
+# nodeSelector:
+#   kubernetes.io/os: linux
+#   node-type: dns-server
+nodeSelector: {}
+
+# Tolerations for pod scheduling on tainted nodes
+# Example:
+# tolerations:
+# - key: "dedicated"
+#   operator: "Equal"
+#   value: "dns"
+#   effect: "NoSchedule"
+tolerations: []
+
+# Affinity rules for pod scheduling
+# Example:
+# affinity:
+#   nodeAffinity:
+#     requiredDuringSchedulingIgnoredDuringExecution:
+#       nodeSelectorTerms:
+#       - matchExpressions:
+#         - key: kubernetes.io/os
+#           operator: In
+#           values:
+#           - linux
+affinity: {}
+
+# =============================================================================
+# Additional Configuration
+# =============================================================================
+
+# Additional environment variables to pass to the container
+# Example:
+# extraEnvVars:
+#   - name: TZ
+#     value: "Europe/Paris"
+#   - name: LOG_LEVEL
+#     value: "INFO"
+extraEnvVars: []
+
+# Additional volumes to mount into the pod
+# Example:
+# extraVolumes:
+#   - name: config-volume
+#     configMap:
+#       name: adguard-config
+extraVolumes: []
+
+# Additional volume mounts for the container
+# Example:
+# extraVolumeMounts:
+#   - name: config-volume
+#     mountPath: /opt/adguardhome/custom
+extraVolumeMounts: []
