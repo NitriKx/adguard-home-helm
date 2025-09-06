@@ -12,37 +12,22 @@ permissions:
 jobs:
   release:
     name: Create GitHub Release
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        fetch-depth: 0
 
-    - name: Install release-please
-      run: npm install -g release-please
-
-    - name: Install Helm
-      uses: azure/setup-helm@v3
-      with:
-        version: v3.12.0
-
-    - name: Create GitHub release
-      run: release-please github-release --repo-url=NitriKx/adguard-home-helm --config-file=.github/release-please-config.json --manifest-file=.github/release-please-manifest.json
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Package and upload chart
+    - name: Configure Git
       run: |
-        # Extract version from tag
-        VERSION=$(echo $GITHUB_REF | sed 's/refs\/tags\/adguard-home-v//')
+        git config user.name "$GITHUB_ACTOR"
+        git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-        # Package the chart
-        helm package charts/adguard-home --version $VERSION
-
-        # Upload to GitHub release (this would be done by release-please)
-        echo "Chart packaged: adguard-home-$VERSION.tgz"
+    - name: Run chart-releaser
+      uses: helm/chart-releaser-action@v1.6.0
+      env:
+        CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
