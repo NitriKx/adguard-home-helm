@@ -65,6 +65,10 @@ The following table lists the configurable parameters of the AdGuard Home chart 
 | `nodeSelector` | Node labels for pod assignment | `{}` |
 | `tolerations` | Tolerations for pod assignment | `[]` |
 | `affinity` | Affinity for pod assignment | `{}` |
+| `healthCheck.enabled` | Enable readiness and liveness probes | `true` |
+| `healthCheck.readinessProbe.*` | Readiness probe configuration | See values.yaml |
+| `healthCheck.livenessProbe.*` | Liveness probe configuration | See values.yaml |
+| `healthCheck.startupProbe.*` | Startup probe configuration (K8s 1.18+) | See values.yaml |
 
 ### Image Configuration
 
