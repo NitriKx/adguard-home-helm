@@ -16,8 +16,6 @@ A Helm chart for deploying [AdGuard Home](https://adguard.com/en-adguard-home/ov
 
 ## Installing the Chart
 
-### From Helm Repository (Recommended)
-
 Add the Helm repository and install the chart:
 
 ```bash
@@ -27,22 +25,6 @@ helm repo update
 
 # Install the chart
 helm install adguard-home nitrikx/adguard-home
-```
-
-### From Local Directory
-
-Alternatively, you can install the chart directly from this repository:
-
-```bash
-helm install adguard-home ./charts/adguard-home
-```
-
-## Uninstalling the Chart
-
-To uninstall the `adguard-home` deployment:
-
-```bash
-helm uninstall adguard-home
 ```
 
 ## Configuration
@@ -188,6 +170,7 @@ If `image.tag` is left empty or not specified, it will automatically use the ver
 
 ### Example Configuration
 
+```
 service:
   type: LoadBalancer
 
@@ -216,29 +199,6 @@ resources:
     memory: 256Mi
 ```
 
-## Accessing AdGuard Home
-
-### Via Service
-
-If you're using `ClusterIP` service type, you can access AdGuard Home through a port-forward:
-
-```bash
-kubectl port-forward svc/adguard-home 3000:80
-```
-
-Then visit `http://localhost:3000` in your browser.
-
-### Via Ingress
-
-If ingress is enabled, AdGuard Home will be accessible at the configured host.
-
-### Via LoadBalancer
-
-If you're using `LoadBalancer` service type, get the external IP:
-
-```bash
-kubectl get svc adguard-home
-```
 
 ## DNS Configuration
 
@@ -267,50 +227,6 @@ By default, the chart creates two PersistentVolumeClaims:
 
 Both PVCs use the same storage class and size configuration.
 
-## Security Considerations
-
-- The chart runs AdGuard Home with privileged access by default (required for DNS functionality)
-- Consider configuring TLS/HTTPS for production deployments
-- Use network policies to restrict access to the AdGuard Home service
-- Regularly update the AdGuard Home image for security patches
-
-## Upgrading
-
-To upgrade the chart:
-
-```bash
-helm upgrade adguard-home ./charts/adguard-home
-```
-
-To upgrade to a new AdGuard Home version, update the `image.tag` value:
-
-```bash
-helm upgrade adguard-home ./charts/adguard-home --set image.tag=v0.107.44
-```
-
-## Troubleshooting
-
-### Check Pod Status
-```bash
-kubectl get pods -l app.kubernetes.io/name=adguard-home
-```
-
-### View Logs
-```bash
-kubectl logs -l app.kubernetes.io/name=adguard-home
-```
-
-### Check PVC Status
-```bash
-kubectl get pvc -l app.kubernetes.io/name=adguard-home
-```
-
-### Common Issues
-
-1. **Port Conflicts**: Ensure ports 53, 80, 443, 853 are not already in use
-2. **Permission Issues**: AdGuard Home requires root privileges for DNS functionality
-3. **Storage Issues**: Ensure your storage class has sufficient space
-
 ## Development
 
 ### Pre-commit Hooks
@@ -319,28 +235,18 @@ This repository includes pre-commit hooks to ensure code quality. The hooks auto
 
 #### Setup
 
-**Option 1: Using pre-commit framework (recommended)**
+### Use pre-commit framework**
 ```bash
 # Install pre-commit
 pip install pre-commit
 
 # Install the pre-commit hooks
-pre-commit install
+pre-commit install --install-hooks
 
 # Run manually on all files
 pre-commit run --all-files
 ```
 
-**Option 2: Git hooks (automatic)**
-The repository includes a `.git/hooks/pre-commit` script that runs automatically on commits.
-
-#### Pre-commit Checks
-
-The hooks perform the following validations:
-- **Helm linting** - Validates chart syntax and best practices
-- **Template rendering** - Ensures templates render without errors
-- **YAML syntax validation** - Checks YAML files for syntax errors
-- **Code formatting** - Ensures consistent formatting
 
 ### Development Tasks
 
@@ -383,82 +289,8 @@ helm unittest charts/adguard-home --file default_test.yaml
 helm unittest charts/adguard-home -v
 ```
 
-### Test Coverage
-
-The test suite covers:
-
-- **Default Configuration**: Validates basic deployment, service, and PVC creation
-- **Persistence**: Tests both PVC creation and existing PVC usage scenarios
-- **Volume Names**: Validates volume name specification for PVCs
-- **Ingress**: Tests ingress creation with various configurations
-- **Service**: Validates different service types and configurations
-- **Resources**: Ensures resource specifications work correctly
-- **Extra Manifests**: Tests additional Kubernetes resource deployment
-
-### Test Structure
-
-Tests are located in `charts/adguard-home/tests/` and follow the Helm unittest format:
-
-```yaml
-suite: test name
-templates:
-  - template.yaml
-tests:
-  - it: should do something
-    set:
-      key: value
-    asserts:
-      - equal:
-          path: spec.field
-          value: expected
-```
 
 ## CI/CD
-
-This repository includes GitHub Actions workflows for automated testing and validation:
-
-### Workflows
-
-- **CI** (`ci.yml`): Comprehensive pipeline for main branch
-  - Runs on pushes to `main` and pull requests
-  - Tests against Kubernetes versions 1.20.15 and 1.25.12
-  - Includes security scanning with Trivy
-  - Automated release PR creation with release-please
-
-- **PR Validation** (`pr-validation.yml`): Fast feedback for pull requests
-  - Runs on pull requests targeting `main`
-  - Quick validation of changes
-  - Focuses on critical checks for faster feedback
-
-### CI Pipeline Features
-
-- **Kubernetes Compatibility**: Validates compatibility with K8s 1.20.15 and 1.25.12
-- **Security Scanning**: Automated vulnerability scanning with Trivy
-- **Automated Releases**: Release management with release-please
-- **Semantic Versioning**: Conventional commit-based versioning
-- **Comprehensive Testing**: Unit tests, linting, templating validation
-
-### Dependency Management
-
-This repository uses [Renovate](https://github.com/renovatebot/renovate) for automated dependency updates:
-
-#### Features
-- **Automated Updates**: Docker images, Helm chart dependencies, GitHub Actions
-- **Automerge**: Automatic merging of patch and minor updates
-- **Security**: Vulnerability alerts and updates
-- **Grouping**: Related updates are grouped into single PRs
-- **Scheduling**: Updates run weekly on Mondays before 6 AM UTC
-
-#### Configuration
-- **AdGuard Home Docker Image**: Monitored for updates with dedicated grouping
-- **Helm Chart Dependencies**: Automatic version updates in `Chart.yaml`
-- **GitHub Actions**: Workflow action versions kept current
-- **Major Updates**: Require manual review and approval
-
-#### Automerge Rules
-- ✅ **Patch updates**: Automatically merged
-- ✅ **Minor updates**: Automatically merged
-- ❌ **Major updates**: Require manual review
 
 ### Release Management
 

@@ -1,3 +1,7 @@
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -20,6 +24,13 @@ repos:
         args:
           - --chart-search-root=charts
           - --template-files=README.md.gotmpl
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.2.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: []
 
   - repo: local
     hooks:
