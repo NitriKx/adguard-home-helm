@@ -1,0 +1,127 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+  security-events: write
+
+jobs:
+  lint-and-test:
+    name: Lint and Test Helm Chart
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        kubernetes-version: ["1.20.15", "1.25.12"]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.12.0
+
+    - name: Setup helm-unittest plugin
+      run: |
+        helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v0.3.4
+
+    - name: Cache Helm dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/Library/Caches/helm/repository
+        key: ${{ runner.os }}-helm-${{ hashFiles('**/Chart.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-helm-
+
+    - name: Run Helm lint
+      run: |
+        echo "🔍 Running Helm lint..."
+        helm lint charts/adguard-home
+
+    - name: Run Helm unit tests
+      run: |
+        echo "🧪 Running Helm unit tests..."
+        helm unittest charts/adguard-home
+
+    - name: Test chart templating
+      run: |
+        echo "📋 Testing chart templating..."
+        helm template test charts/adguard-home > /dev/null
+
+    - name: Test chart templating with custom values
+      run: |
+        echo "📋 Testing chart templating with custom values..."
+        helm template test charts/adguard-home \
+          --set adguardHome.timezone="America/New_York" \
+          --set persistence.enabled=true \
+          --set ingress.enabled=true \
+          --set healthCheck.enabled=true > /dev/null
+
+    - name: Test chart templating with config YAML
+      run: |
+        echo "📋 Testing chart templating with custom config..."
+        helm template test charts/adguard-home \
+          --set 'adguardHome.configYaml=bind_host: 0.0.0.0' > /dev/null
+
+    - name: Test Kubernetes version compatibility
+      run: |
+        echo "🔧 Testing Kubernetes ${{ matrix.kubernetes-version }} compatibility..."
+        helm template test charts/adguard-home --kube-version ${{ matrix.kubernetes-version }} > /dev/null
+        echo "✅ Compatible with Kubernetes ${{ matrix.kubernetes-version }}"
+
+    - name: Validate chart
+      run: |
+        echo "🔍 Validating chart..."
+        helm lint charts/adguard-home
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'config'
+        scan-ref: './charts/adguard-home'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  release-please:
+    name: Release please
+    runs-on: ubuntu-latest
+    needs: [lint-and-test, security-scan]
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          # this assumes that you have created a personal access token
+          # (PAT) and configured it as a GitHub action secret named
+          # `RELEASE_PLEASE_TOKEN` (this secret name is not important).
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+          # this is a built-in strategy in release-please, see "Action Inputs"
+          # for more options
+          release-type: simple
+          # optional. customize path to release-please-config.json
+          config-file: .github/release-please-config.json
+          # optional. customize path to .release-please-manifest.json
+          manifest-file: .github/release-please-manifest.json
