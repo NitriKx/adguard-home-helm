@@ -213,12 +213,6 @@ task --list
 # Lint the Helm chart
 task lint
 
-# Run the test suite
-task test
-
-# Run full CI pipeline (lint + test)
-task ci
-
 # Render chart templates
 task template
 

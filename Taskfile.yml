@@ -15,11 +15,6 @@ tasks:
     cmds:
       - helm lint {{.CHART_DIR}}
 
-  test:
-    desc: Run the comprehensive test suite
-    cmds:
-      - ./{{.CHART_DIR}}/tests/test.sh
-
   template:
     desc: Render chart templates with default values
     cmds:
@@ -39,12 +34,6 @@ tasks:
     desc: Uninstall the chart from the current Kubernetes cluster
     cmds:
       - helm uninstall {{.RELEASE_NAME}}
-
-  ci:
-    desc: Run full CI pipeline (lint + test)
-    cmds:
-      - task lint
-      - task test
 
   help:
     cmds:
