@@ -9,6 +9,7 @@ A Helm chart for deploying [AdGuard Home](https://adguard.com/en/adguard-home/ov
 
 - Kubernetes 1.20+
 - Helm 3.0+
+- [Task](https://taskfile.dev/) (optional, for development workflow automation)
 
 ## Installing the Chart
 
@@ -200,6 +201,36 @@ kubectl get pvc -l app.kubernetes.io/name=adguard-home
 1. **Port Conflicts**: Ensure ports 53, 80, 443, 853 are not already in use
 2. **Permission Issues**: AdGuard Home requires root privileges for DNS functionality
 3. **Storage Issues**: Ensure your storage class has sufficient space
+
+## Development
+
+This repository includes a [Taskfile](https://taskfile.dev/) for development workflow automation. If you have Task installed, you can use the following commands:
+
+```bash
+# List all available tasks
+task --list
+
+# Lint the Helm chart
+task lint
+
+# Run the test suite
+task test
+
+# Run full CI pipeline (lint + test)
+task ci
+
+# Render chart templates
+task template
+
+# Package the chart
+task package
+
+# Install the chart locally (requires Kubernetes cluster)
+task install
+
+# Uninstall the chart
+task uninstall
+```
 
 ## Contributing
 
