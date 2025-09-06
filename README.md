@@ -69,6 +69,27 @@ The following table lists the configurable parameters of the AdGuard Home chart 
 | `healthCheck.readinessProbe.*` | Readiness probe configuration | See values.yaml |
 | `healthCheck.livenessProbe.*` | Liveness probe configuration | See values.yaml |
 | `healthCheck.startupProbe.*` | Startup probe configuration (K8s 1.18+) | See values.yaml |
+| `adguardHome.timezone` | Timezone for AdGuard Home container | `"UTC"` |
+
+### AdGuard Home Configuration
+
+The chart provides configuration options specific to AdGuard Home:
+
+#### Timezone Configuration
+
+AdGuard Home uses timezone information for log timestamps and scheduled tasks. Configure the timezone using:
+
+```yaml
+adguardHome:
+  timezone: "America/New_York"  # or any valid timezone
+```
+
+**Common timezone examples:**
+- `"UTC"` - Coordinated Universal Time
+- `"America/New_York"` - Eastern Time
+- `"Europe/London"` - British Summer Time
+- `"Asia/Tokyo"` - Japan Standard Time
+- `"Australia/Sydney"` - Australian Eastern Time
 
 ### Image Configuration
 

@@ -40,7 +40,7 @@ spec:
               protocol: TCP
           env:
             - name: TZ
-              value: "UTC"
+              value: {{ .Values.adguardHome.timezone | quote }}
             {{- with .Values.extraEnvVars }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

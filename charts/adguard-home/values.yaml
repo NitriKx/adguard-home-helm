@@ -170,6 +170,16 @@ securityContext:
 resources: {}
 
 # =============================================================================
+# AdGuard Home Configuration
+# =============================================================================
+# Configuration options specific to AdGuard Home application
+adguardHome:
+  # Timezone for the AdGuard Home container
+  # This affects log timestamps and scheduled tasks
+  # Examples: "UTC", "America/New_York", "Europe/London", "Asia/Tokyo"
+  timezone: "UTC"
+
+# =============================================================================
 # Health Checks Configuration
 # =============================================================================
 # Configure readiness and liveness probes for the AdGuard Home container

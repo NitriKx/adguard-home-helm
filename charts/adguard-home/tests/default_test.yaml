@@ -47,6 +47,12 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
           value: 60
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: TZ
+      - equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: UTC
 
 ---
 suite: test default service configuration
@@ -136,3 +142,21 @@ tests:
           path: spec.template.spec.containers[0].livenessProbe
       - notExists:
           path: spec.template.spec.containers[0].startupProbe
+
+---
+suite: test custom timezone configuration
+templates:
+  - deployment.yaml
+tests:
+  - it: should use custom timezone when configured
+    set:
+      adguardHome.timezone: "America/New_York"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: TZ
+      - equal:
+          path: spec.template.spec.containers[0].env[0].value
+          value: America/New_York
