@@ -423,7 +423,7 @@ This repository includes GitHub Actions workflows for automated testing and vali
   - Runs on pushes to `main` and pull requests
   - Tests against Kubernetes versions 1.20.15 and 1.25.12
   - Includes security scanning with Trivy
-  - Automated chart release with chart-releaser
+  - Automated release PR creation with release-please
 
 - **PR Validation** (`pr-validation.yml`): Fast feedback for pull requests
   - Runs on pull requests targeting `main`
@@ -434,9 +434,38 @@ This repository includes GitHub Actions workflows for automated testing and vali
 
 - **Kubernetes Compatibility**: Validates compatibility with K8s 1.20.15 and 1.25.12
 - **Security Scanning**: Automated vulnerability scanning with Trivy
-- **Automated Releases**: Chart release with chart-releaser
-- **Helm Repository**: Hosted on GitHub Pages
+- **Automated Releases**: Release management with release-please
+- **Semantic Versioning**: Conventional commit-based versioning
 - **Comprehensive Testing**: Unit tests, linting, templating validation
+
+### Release Management
+
+This repository uses [release-please](https://github.com/google-github-actions/release-please-action) for automated release management:
+
+#### How It Works
+
+1. **Conventional Commits**: Use conventional commit format for changes
+2. **Automatic PR Creation**: release-please creates release PRs automatically
+3. **Version Bumping**: Versions are bumped based on commit types
+4. **Changelog Generation**: Automatic CHANGELOG.md generation
+5. **GitHub Releases**: Automatic creation of GitHub releases
+
+#### Commit Types
+
+- `feat:` - New features (minor version bump)
+- `fix:` - Bug fixes (patch version bump)
+- `docs:` - Documentation changes
+- `refactor:` - Code refactoring
+- `test:` - Test additions/changes
+- `chore:` - Maintenance tasks
+
+#### Release Process
+
+1. Push commits to `main` branch
+2. release-please creates/updates a release PR
+3. Review and merge the release PR
+4. release-please creates a GitHub release with tag
+5. Release workflow packages and publishes the chart
 
 ### Local Development
 

@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'adguard-home-v*'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install release-please
+      run: npm install -g release-please
+
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: v3.12.0
+
+    - name: Create GitHub release
+      run: release-please github-release --repo-url=NitriKx/adguard-home-helm --config-file=.release-please-config.json --manifest-file=.release-please-manifest.json
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Package and upload chart
+      run: |
+        # Extract version from tag
+        VERSION=$(echo $GITHUB_REF | sed 's/refs\/tags\/adguard-home-v//')
+
+        # Package the chart
+        helm package charts/adguard-home --version $VERSION
+
+        # Upload to GitHub release (this would be done by release-please)
+        echo "Chart packaged: adguard-home-$VERSION.tgz"

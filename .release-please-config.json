@@ -1,0 +1,19 @@
+{
+  "packages": {
+    "charts/adguard-home": {
+      "package-name": "adguard-home",
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "helm",
+      "bump-minor-pre-major": false,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false
+    }
+  },
+  "plugins": [
+    {
+      "type": "helm",
+      "chart-path": "charts/adguard-home"
+    }
+  ]
+}

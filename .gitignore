@@ -14,9 +14,8 @@
 # Helm
 *.tgz
 
-# Chart Releaser
-.cr-release-packages/
-.cr-index/
+# Release Please
+.release-please-manifest.json
 
 # OS generated files
 .DS_Store
