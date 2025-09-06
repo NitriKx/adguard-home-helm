@@ -15,7 +15,7 @@
 *.tgz
 
 # Release Please
-.release-please-manifest.json
+# Note: .release-please-manifest.json should be committed to track versions
 
 # OS generated files
 .DS_Store
