@@ -9,11 +9,5 @@
       "draft": false,
       "prerelease": false
     }
-  },
-  "plugins": [
-    {
-      "type": "helm",
-      "chart-path": "charts/adguard-home"
-    }
-  ]
+  }
 }
