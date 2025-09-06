@@ -1,0 +1,170 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "adguard-home.fullname" . }}
+  labels:
+    {{- include "adguard-home.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "adguard-home.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "adguard-home.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.adguardHome.configYaml }}
+      initContainers:
+        - name: adguard-home-config
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              cat > /opt/adguardhome/conf/AdGuardHome.yaml << 'EOF'
+              {{ .Values.adguardHome.configYaml | indent 14 }}
+              EOF
+          volumeMounts:
+            - name: config
+              mountPath: /opt/adguardhome/conf
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 32Mi
+      {{- end }}
+      containers:
+        - name: adguard-home
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+            - name: https
+              containerPort: 443
+              protocol: TCP
+            - name: https-udp
+              containerPort: 443
+              protocol: UDP
+            - name: http-beta
+              containerPort: 3000
+              protocol: TCP
+            - name: dns
+              containerPort: 53
+              protocol: UDP
+            - name: dns-tcp
+              containerPort: 53
+              protocol: TCP
+            - name: dhcp-server
+              containerPort: 67
+              protocol: UDP
+            - name: dhcp-client-tcp
+              containerPort: 68
+              protocol: TCP
+            - name: dhcp-client-udp
+              containerPort: 68
+              protocol: UDP
+            - name: dns-tls
+              containerPort: 853
+              protocol: TCP
+            - name: dns-quic-784
+              containerPort: 784
+              protocol: UDP
+            - name: dns-quic-853
+              containerPort: 853
+              protocol: UDP
+            - name: dns-quic-8853
+              containerPort: 8853
+              protocol: UDP
+            - name: dnscrypt-tcp
+              containerPort: 5443
+              protocol: TCP
+            - name: dnscrypt-udp
+              containerPort: 5443
+              protocol: UDP
+          env:
+            - name: TZ
+              value: {{ .Values.adguardHome.timezone | quote }}
+            {{- with .Values.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /opt/adguardhome/conf
+            - name: work
+              mountPath: /opt/adguardhome/work
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.healthCheck.enabled }}
+          # Readiness probe
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.healthCheck.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthCheck.readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthCheck.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.healthCheck.readinessProbe.successThreshold }}
+          # Liveness probe
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.healthCheck.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthCheck.livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthCheck.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.healthCheck.livenessProbe.successThreshold }}
+          {{- if and .Values.healthCheck.startupProbe.enabled (.Capabilities.APIVersions.Has "startupProbe") }}
+          # Startup probe (Kubernetes 1.18+)
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: {{ .Values.healthCheck.startupProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.healthCheck.startupProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.healthCheck.startupProbe.timeoutSeconds }}
+            failureThreshold: {{ .Values.healthCheck.startupProbe.failureThreshold }}
+            successThreshold: {{ .Values.healthCheck.startupProbe.successThreshold }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.config.existingClaim | default (printf "%s-config" (include "adguard-home.fullname" .)) }}
+        - name: work
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.work.existingClaim | default (printf "%s-work" (include "adguard-home.fullname" .)) }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
