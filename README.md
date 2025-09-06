@@ -7,7 +7,7 @@ A Helm chart for deploying [AdGuard Home](https://adguard.com/en/adguard-home/ov
 
 ## Prerequisites
 
-- Kubernetes 1.19+
+- Kubernetes 1.20+
 - Helm 3.0+
 
 ## Installing the Chart

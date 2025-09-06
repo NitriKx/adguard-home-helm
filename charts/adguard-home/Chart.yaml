@@ -4,6 +4,7 @@ description: A Helm chart for deploying AdGuard Home DNS server
 type: application
 version: 0.1.0
 appVersion: "v0.107.43"
+kubeVersion: ">=1.20.0"
 keywords:
   - dns
   - adblock
