@@ -5,6 +5,13 @@
 
 ### Features
 
+* initial import ([6dfba16](https://github.com/NitriKx/adguard-home-helm/commit/6dfba160f8d53897376f7c41f8c8018911342561))
+
+## 1.0.0 (2025-09-06)
+
+
+### Features
+
 * Add comprehensive GitHub Actions CI/CD workflows ([08364e6](https://github.com/NitriKx/adguard-home-helm/commit/08364e61786f489d1bd8dd0489901e580b64aa7d))
 * Add comprehensive health checks and probes ([87475d0](https://github.com/NitriKx/adguard-home-helm/commit/87475d01d15841e8cb3e081a1c19a6cc424ebd59))
 * Add comprehensive Helm unit tests using unittest framework ([5249893](https://github.com/NitriKx/adguard-home-helm/commit/52498935f916532ccc444a2bf4f1b5d0ac859c8f))
