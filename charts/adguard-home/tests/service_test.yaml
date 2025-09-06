@@ -1,0 +1,105 @@
+suite: test service configuration
+templates:
+  - service.yaml
+tests:
+  - it: should render ClusterIP service by default
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.type
+          value: ClusterIP
+      - equal:
+          path: spec.ports[0].name
+          value: http
+      - equal:
+          path: spec.ports[0].port
+          value: 80
+      - equal:
+          path: spec.ports[0].targetPort
+          value: http
+      - equal:
+          path: spec.ports[1].name
+          value: https
+      - equal:
+          path: spec.ports[1].port
+          value: 443
+      - equal:
+          path: spec.ports[1].targetPort
+          value: https
+      - equal:
+          path: spec.ports[2].name
+          value: dns
+      - equal:
+          path: spec.ports[2].port
+          value: 53
+      - equal:
+          path: spec.ports[2].targetPort
+          value: dns
+      - equal:
+          path: spec.ports[3].name
+          value: dns-tcp
+      - equal:
+          path: spec.ports[3].port
+          value: 53
+      - equal:
+          path: spec.ports[3].targetPort
+          value: dns-tcp
+      - equal:
+          path: spec.ports[4].name
+          value: dns-tls
+      - equal:
+          path: spec.ports[4].port
+          value: 853
+      - equal:
+          path: spec.ports[4].targetPort
+          value: dns-tls
+
+  - it: should render LoadBalancer service when specified
+    set:
+      service.type: LoadBalancer
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.type
+          value: LoadBalancer
+
+  - it: should render NodePort service when specified
+    set:
+      service.type: NodePort
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.type
+          value: NodePort
+
+  - it: should include service annotations when specified
+    set:
+      service.annotations:
+        service.beta.kubernetes.io/aws-load-balancer-type: nlb
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.annotations["service.beta.kubernetes.io/aws-load-balancer-type"]
+          value: nlb
+      - equal:
+          path: metadata.annotations["service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled"]
+          value: "true"
+
+  - it: should use custom port when specified
+    set:
+      service.port: 8080
+      service.httpsPort: 8443
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: spec.ports[0].port
+          value: 8080
+      - equal:
+          path: spec.ports[1].port
+          value: 8443
