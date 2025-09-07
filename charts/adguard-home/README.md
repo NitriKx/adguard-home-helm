@@ -6,6 +6,12 @@ A Helm chart for deploying AdGuard Home DNS server
 
 **Homepage:** <https://adguard.com/en/adguard-home/overview.html>
 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| NitriKx |  |  |
+
 ## Source Code
 
 * <https://github.com/AdguardTeam/AdGuardHome>

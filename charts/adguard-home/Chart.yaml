@@ -15,3 +15,5 @@ sources:
   - https://github.com/AdguardTeam/AdGuardHome
   - https://hub.docker.com/r/adguard/adguardhome
   - https://github.com/NitriKx/adguard-home-helm
+maintainers:
+  - name: NitriKx
