@@ -1,35 +1,168 @@
+{{- if .Values.services.dns.enabled -}}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "adguard-home.fullname" . }}
+  name: {{ include "adguard-home.fullname" . }}-dns
   labels:
     {{- include "adguard-home.labels" . | nindent 4 }}
-  {{- with .Values.service.annotations }}
+    app.kubernetes.io/component: dns
+    {{- with .Values.services.dns.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.services.dns.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.services.dns.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
-    - port: {{ .Values.service.httpsPort }}
-      targetPort: https
-      protocol: TCP
-      name: https
-    - port: {{ .Values.service.dnsPort }}
-      targetPort: dns
-      protocol: UDP
-      name: dns
-    - port: {{ .Values.service.dnsPort }}
-      targetPort: dns-tcp
-      protocol: TCP
-      name: dns-tcp
-    - port: {{ .Values.service.dnsTlsPort }}
-      targetPort: dns-tls
-      protocol: TCP
-      name: dns-tls
+    {{- range $portName, $portConfig := .Values.services.dns.ports }}
+    - port: {{ $portConfig.port }}
+      targetPort: {{ $portConfig.targetPort }}
+      protocol: {{ $portConfig.protocol }}
+      name: {{ $portName }}
+    {{- end }}
   selector:
     {{- include "adguard-home.selectorLabels" . | nindent 4 }}
+{{- end }}
+{{- if .Values.services.dhcp.enabled -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "adguard-home.fullname" . }}-dhcp
+  labels:
+    {{- include "adguard-home.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dhcp
+    {{- with .Values.services.dhcp.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.services.dhcp.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.services.dhcp.type }}
+  ports:
+    {{- range $portName, $portConfig := .Values.services.dhcp.ports }}
+    - port: {{ $portConfig.port }}
+      targetPort: {{ $portConfig.targetPort }}
+      protocol: {{ $portConfig.protocol }}
+      name: {{ $portName }}
+    {{- end }}
+  selector:
+    {{- include "adguard-home.selectorLabels" . | nindent 4 }}
+{{- end }}
+{{- if .Values.services.admin.enabled -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "adguard-home.fullname" . }}-admin
+  labels:
+    {{- include "adguard-home.labels" . | nindent 4 }}
+    app.kubernetes.io/component: admin
+    {{- with .Values.services.admin.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.services.admin.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.services.admin.type }}
+  ports:
+    {{- range $portName, $portConfig := .Values.services.admin.ports }}
+    - port: {{ $portConfig.port }}
+      targetPort: {{ $portConfig.targetPort }}
+      protocol: {{ $portConfig.protocol }}
+      name: {{ $portName }}
+    {{- end }}
+  selector:
+    {{- include "adguard-home.selectorLabels" . | nindent 4 }}
+{{- end }}
+{{- if .Values.services.dnsOverTLS.enabled -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "adguard-home.fullname" . }}-dns-over-tls
+  labels:
+    {{- include "adguard-home.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dns-over-tls
+    {{- with .Values.services.dnsOverTLS.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.services.dnsOverTLS.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.services.dnsOverTLS.type }}
+  ports:
+    {{- range $portName, $portConfig := .Values.services.dnsOverTLS.ports }}
+    - port: {{ $portConfig.port }}
+      targetPort: {{ $portConfig.targetPort }}
+      protocol: {{ $portConfig.protocol }}
+      name: {{ $portName }}
+    {{- end }}
+  selector:
+    {{- include "adguard-home.selectorLabels" . | nindent 4 }}
+{{- end }}
+{{- if .Values.services.dnsOverQUIC.enabled -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "adguard-home.fullname" . }}-dns-over-quic
+  labels:
+    {{- include "adguard-home.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dns-over-quic
+    {{- with .Values.services.dnsOverQUIC.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.services.dnsOverQUIC.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.services.dnsOverQUIC.type }}
+  ports:
+    {{- range $portName, $portConfig := .Values.services.dnsOverQUIC.ports }}
+    - port: {{ $portConfig.port }}
+      targetPort: {{ $portConfig.targetPort }}
+      protocol: {{ $portConfig.protocol }}
+      name: {{ $portName }}
+    {{- end }}
+  selector:
+    {{- include "adguard-home.selectorLabels" . | nindent 4 }}
+{{- end }}
+{{- if .Values.services.dnsCrypt.enabled -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "adguard-home.fullname" . }}-dnscrypt
+  labels:
+    {{- include "adguard-home.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dnscrypt
+    {{- with .Values.services.dnsCrypt.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.services.dnsCrypt.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.services.dnsCrypt.type }}
+  ports:
+    {{- range $portName, $portConfig := .Values.services.dnsCrypt.ports }}
+    - port: {{ $portConfig.port }}
+      targetPort: {{ $portConfig.targetPort }}
+      protocol: {{ $portConfig.protocol }}
+      name: {{ $portName }}
+    {{- end }}
+  selector:
+    {{- include "adguard-home.selectorLabels" . | nindent 4 }}
+{{- end }}

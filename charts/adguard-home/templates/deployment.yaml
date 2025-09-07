@@ -51,15 +51,45 @@ spec:
             - name: https
               containerPort: 443
               protocol: TCP
+            - name: https-udp
+              containerPort: 443
+              protocol: UDP
+            - name: http-beta
+              containerPort: 3000
+              protocol: TCP
             - name: dns
               containerPort: 53
               protocol: UDP
             - name: dns-tcp
               containerPort: 53
               protocol: TCP
+            - name: dhcp-server
+              containerPort: 67
+              protocol: UDP
+            - name: dhcp-client-tcp
+              containerPort: 68
+              protocol: TCP
+            - name: dhcp-client-udp
+              containerPort: 68
+              protocol: UDP
             - name: dns-tls
               containerPort: 853
               protocol: TCP
+            - name: dns-quic-784
+              containerPort: 784
+              protocol: UDP
+            - name: dns-quic-853
+              containerPort: 853
+              protocol: UDP
+            - name: dns-quic-8853
+              containerPort: 8853
+              protocol: UDP
+            - name: dnscrypt-tcp
+              containerPort: 5443
+              protocol: TCP
+            - name: dnscrypt-udp
+              containerPort: 5443
+              protocol: UDP
           env:
             - name: TZ
               value: {{ .Values.adguardHome.timezone | quote }}

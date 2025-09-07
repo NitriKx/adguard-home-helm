@@ -1,311 +1,343 @@
-# Default values for AdGuard Home Helm chart
-# This is a YAML-formatted file that declares variables to be passed into Helm templates.
-# Each section contains configuration options for different aspects of the AdGuard Home deployment.
+# Default values for adguard-home.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
 
-# =============================================================================
-# AdGuard Home Image Configuration
-# =============================================================================
-# Configure the Docker image used for AdGuard Home deployment
-image:
-  # Docker repository for AdGuard Home image
-  repository: adguard/adguardhome
-
-  # Image tag to use. If empty, uses Chart.appVersion from Chart.yaml
-  # Examples: "v0.107.43", "latest", or leave empty for Chart version
-  tag: ""
-
-  # Image pull policy: Always, Never, or IfNotPresent
-  pullPolicy: IfNotPresent
-
-# =============================================================================
-# Service Configuration
-# =============================================================================
-# Configure how AdGuard Home is exposed as a Kubernetes service
-service:
-  # Service type: ClusterIP, NodePort, LoadBalancer, or ExternalName
-  # - ClusterIP: Internal cluster access only
-  # - LoadBalancer: External load balancer (cloud environments)
-  # - NodePort: Access via <NodeIP>:<NodePort>
-  type: ClusterIP
-
-  # HTTP port for web interface (redirects to HTTPS by default)
-  port: 80
-
-  # HTTPS port for secure web interface
-  httpsPort: 443
-
-  # DNS port for standard DNS queries (UDP/TCP)
-  dnsPort: 53
-
-  # DNS over TLS port for encrypted DNS queries
-  dnsTlsPort: 853
-
-  # Additional annotations for the service (e.g., for load balancers)
-  annotations: {}
-
-# =============================================================================
-# Ingress Configuration
-# =============================================================================
-# Configure external access via Kubernetes Ingress
-ingress:
-  # Enable/disable ingress creation
-  enabled: false
-
-  # Ingress class name (e.g., "nginx", "traefik")
-  # Leave empty to use cluster default
-  className: ""
-
-  # Annotations for ingress controller (e.g., cert-manager, auth, etc.)
-  # Example: cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  annotations: {}
-
-  # Host configuration for the ingress
-  hosts:
-    - # Domain name for AdGuard Home
-      host: adguard-home.local
-      # URL paths to expose
-      paths:
-        - # Root path for web interface
-          path: /
-          # Path type: Exact, Prefix, or ImplementationSpecific
-          pathType: Prefix
-
-  # TLS configuration for HTTPS
-  # Example:
-  # - secretName: adguard-home-tls
-  #   hosts:
-  #     - adguard-home.example.com
-  tls: []
-
-# =============================================================================
-# Persistence Configuration
-# =============================================================================
-# Configure persistent storage for AdGuard Home data
-persistence:
-  # Enable/disable persistent volume claims
-  enabled: true
-
-  # Configuration data persistence
-  config:
-    # Use an existing PVC instead of creating a new one
-    # If specified, the PVC creation is skipped and this existing claim is used
-    existingClaim: ""
-    # Volume name to use when creating the PVC (optional)
-    # Leave empty to let Kubernetes assign a volume automatically
-    volumeName: ""
-    # Access mode for the PVC: ReadWriteOnce, ReadOnlyMany, ReadWriteMany
-    accessMode: ReadWriteOnce
-    # Storage size for configuration data
-    size: 1Gi
-    # Storage class name. Leave empty to use cluster default
-    # Examples: "standard", "fast-ssd", "local-storage"
-    storageClass: ""
-    # Additional annotations for the PVC
-    annotations: {}
-
-  # Work data persistence
-  work:
-    # Use an existing PVC instead of creating a new one
-    # If specified, the PVC creation is skipped and this existing claim is used
-    existingClaim: ""
-    # Volume name to use when creating the PVC (optional)
-    # Leave empty to let Kubernetes assign a volume automatically
-    volumeName: ""
-    # Access mode for the PVC: ReadWriteOnce, ReadOnlyMany, ReadWriteMany
-    accessMode: ReadWriteOnce
-    # Storage size for work data
-    size: 1Gi
-    # Storage class name. Leave empty to use cluster default
-    # Examples: "standard", "fast-ssd", "local-storage"
-    storageClass: ""
-    # Additional annotations for the PVC
-    annotations: {}
-
-# =============================================================================
-# Security Configuration
-# =============================================================================
-# Configure security contexts for pods and containers
-
-# Pod-level security context (applies to all containers in the pod)
-podSecurityContext:
-  # User ID to run the pod as (0 = root, required for DNS functionality)
-  runAsUser: 0
-  # Group ID to run the pod as
-  runAsGroup: 0
-  # File system group ID for volume access
-  fsGroup: 0
-
-# Container-level security context
-securityContext:
-  # Run container in privileged mode (required for DNS port binding)
-  privileged: false
-  # Allow privilege escalation
-  allowPrivilegeEscalation: false
-  # Mount root filesystem as read-only
-  readOnlyRootFilesystem: false
-  # Run as non-root user (set to false for DNS functionality)
-  runAsNonRoot: false
-  # User ID to run container as
-  runAsUser: 0
-  # Group ID to run container as
-  runAsGroup: 0
-  # Linux capabilities to drop (ALL = drop all capabilities)
-  capabilities:
-    drop:
-      - ALL
-
-# =============================================================================
-# Resource Management
-# =============================================================================
-# Configure CPU and memory limits and requests
-# Leave empty to use cluster defaults or specify as needed
-# Example:
-# resources:
-#   limits:
-#     cpu: 500m
-#     memory: 512Mi
-#   requests:
-#     cpu: 100m
-#     memory: 128Mi
-resources: {}
-
-# =============================================================================
-# AdGuard Home Configuration
-# =============================================================================
-# Configuration options specific to AdGuard Home application
+# AdGuard Home configuration
 adguardHome:
-  # Timezone for the AdGuard Home container
-  # This affects log timestamps and scheduled tasks
-  # Examples: "UTC", "America/New_York", "Europe/London", "Asia/Tokyo"
-  timezone: "UTC"
-
-  # Custom AdGuard Home configuration YAML
-  # If specified, an init container will write this configuration to AdGuardHome.yaml
-  # This allows full customization of AdGuard Home settings
-  # Example:
+  # Timezone for the container
+  timezone: UTC
+  # Optional AdGuard Home configuration YAML
   # configYaml: |
   #   bind_host: 0.0.0.0
   #   bind_port: 80
-  #   users:
-  #     - name: admin
-  #       password: $2a$10$...
+  #   beta_bind_port: 3000
+  #   users: []
+  #   auth_attempts: 5
+  #   block_auth_min: 15
+  #   http_proxy: ""
+  #   language: ""
+  #   debug_pprof: false
+  #   web_session_ttl: 720
   #   dns:
   #     bind_hosts:
   #       - 0.0.0.0
   #     port: 53
+  #     anonymize_client_ip: false
+  #     ratelimit: 20
+  #     ratelimit_subnet_len_ipv4: 24
+  #     ratelimit_subnet_len_ipv6: 56
+  #     ratelimit_whitelist: []
+  #     refuse_any: true
   #     upstream_dns:
-  #       - 8.8.8.8
-  #   filtering:
-  #     protection_enabled: true
+  #       - https://dns10.quad9.net/dns-query
+  #     upstream_dns_file: ""
+  #     bootstrap_dns:
+  #       - 9.9.9.10
+  #       - 149.112.112.10
+  #       - 2620:fe::10
+  #       - 2620:fe::fe:10
+  #     fallback_dns: []
+  #     local_ptr_upstreams: []
+  #     use_private_ptr_resolvers: true
+  #     resolve_clients: true
+  #     local_client_sync: false
+  #     all_servers: false
+  #     fastest_addr: false
+  #     fastest_timeout: 1s
+  #     allowed_clients: []
+  #     disallowed_clients: []
+  #     blocked_hosts: []
+  #     trusted_proxies:
+  #       - 127.0.0.0/8
+  #       - ::1/128
+  #     cache_size: 4194304
+  #     cache_ttl_min: 0
+  #     cache_ttl_max: 0
+  #     cache_optimistic: false
+  #     bogus_nxdomain: []
+  #     aaaa_disabled: false
+  #     enable_dnssec: false
+  #     edns_client_subnet: false
+  #     max_goroutines: 300
+  #     handle_ddr: true
+  #     ipset: []
   #     filtering_enabled: true
-  configYaml: ""
+  #     filters_update_interval: 24
+  #     parental_enabled: false
+  #     safebrowsing_enabled: false
+  #     safebrowsing_cache_size: 1048576
+  #     safesearch_enabled: false
+  #     querylog_enabled: true
+  #     querylog_file_enabled: true
+  #     querylog_interval: 168h
+  #     querylog_size_memory: 1000
+  #     anonymize_client_ip: false
+  #     protection_enabled: true
+  #     dhcp:
+  #       enabled: false
+  #       interface_name: ""
+  #       dhcpv4:
+  #         gateway_ip: ""
+  #         subnet_mask: ""
+  #         range_start: ""
+  #         range_end: ""
+  #         lease_duration: 86400
+  #         icmp_timeout_msec: 1000
+  #         options: []
+  #       dhcpv6:
+  #         range_start: ""
+  #         lease_duration: 86400
+  #         options: []
+  #     tls:
+  #       enabled: false
+  #       server_name: ""
+  #       force_https: false
+  #       port_https: 443
+  #       port_dns_over_tls: 853
+  #       port_dns_over_quic: 784
+  #       port_dnscrypt: 0
+  #       allow_unencrypted_doh: false
+  #       strict_sni_check: false
+  #       certificate_path: ""
+  #       private_key_path: ""
+  #       certificate_chain: ""
+  #       private_key: ""
+  #       pki_path: ""
+  #     filters:
+  #       - enabled: true
+  #         url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
+  #         name: AdGuard DNS filter
+  #         id: 1
+  #     whitelist_filters: []
+  #     user_rules: []
+  #     dhcp:
+  #       enabled: false
+  #       interface_name: ""
+  #       dhcpv4:
+  #         gateway_ip: ""
+  #         subnet_mask: ""
+  #         range_start: ""
+  #         range_end: ""
+  #         lease_duration: 86400
+  #         icmp_timeout_msec: 1000
+  #         options: []
+  #       dhcpv6:
+  #         range_start: ""
+  #         lease_duration: 86400
+  #         options: []
+  #     client_settings: []
 
-# =============================================================================
-# Health Checks Configuration
-# =============================================================================
-# Configure readiness and liveness probes for the AdGuard Home container
+# Docker image configuration
+image:
+  repository: adguard/adguardhome
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+# Service configurations
+services:
+  # DNS service (port 53/tcp and 53/udp)
+  dns:
+    enabled: true
+    type: LoadBalancer
+    annotations: {}
+    labels: {}
+    ports:
+      dns:
+        port: 53
+        targetPort: 53
+        protocol: UDP
+      dns-tcp:
+        port: 53
+        targetPort: 53
+        protocol: TCP
+
+  # DHCP service (ports 67/udp, 68/tcp and 68/udp)
+  dhcp:
+    enabled: true
+    type: LoadBalancer
+    annotations: {}
+    labels: {}
+    ports:
+      dhcp-server:
+        port: 67
+        targetPort: 67
+        protocol: UDP
+      dhcp-client-tcp:
+        port: 68
+        targetPort: 68
+        protocol: TCP
+      dhcp-client-udp:
+        port: 68
+        targetPort: 68
+        protocol: UDP
+
+  # Admin service (ports 80/tcp, 443/tcp, 443/udp, 3000/tcp)
+  admin:
+    enabled: true
+    type: ClusterIP
+    annotations: {}
+    labels: {}
+    ports:
+      http:
+        port: 80
+        targetPort: 80
+        protocol: TCP
+      https:
+        port: 443
+        targetPort: 443
+        protocol: TCP
+      https-udp:
+        port: 443
+        targetPort: 443
+        protocol: UDP
+      http-beta:
+        port: 3000
+        targetPort: 3000
+        protocol: TCP
+
+  # DNS over TLS service (port 853/tcp)
+  dnsOverTLS:
+    enabled: true
+    type: LoadBalancer
+    annotations: {}
+    labels: {}
+    ports:
+      dns-tls:
+        port: 853
+        targetPort: 853
+        protocol: TCP
+
+  # DNS over QUIC service (ports 784/udp, 853/udp and 8853/udp)
+  dnsOverQUIC:
+    enabled: true
+    type: LoadBalancer
+    annotations: {}
+    labels: {}
+    ports:
+      dns-quic-784:
+        port: 784
+        targetPort: 784
+        protocol: UDP
+      dns-quic-853:
+        port: 853
+        targetPort: 853
+        protocol: UDP
+      dns-quic-8853:
+        port: 8853
+        targetPort: 8853
+        protocol: UDP
+
+  # DNSCrypt service (ports 5443/tcp and 5443/udp)
+  dnsCrypt:
+    enabled: true
+    type: LoadBalancer
+    annotations: {}
+    labels: {}
+    ports:
+      dnscrypt-tcp:
+        port: 5443
+        targetPort: 5443
+        protocol: TCP
+      dnscrypt-udp:
+        port: 5443
+        targetPort: 5443
+        protocol: UDP
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: adguard-home.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: adguard-home-tls
+  #    hosts:
+  #      - adguard-home.local
+
+# Persistence configuration
+persistence:
+  config:
+    enabled: true
+    size: 5Gi
+    accessModes:
+      - ReadWriteOnce
+    # existingClaim: ""
+    storageClass: ""
+  work:
+    enabled: true
+    size: 1Gi
+    accessModes:
+      - ReadWriteOnce
+    # existingClaim: ""
+    storageClass: ""
+
+# Health check configuration
 healthCheck:
   enabled: true
-  # Readiness probe configuration
   readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+    successThreshold: 1
+  livenessProbe:
     initialDelaySeconds: 30
     periodSeconds: 10
     timeoutSeconds: 5
-    failureThreshold: 3
+    failureThreshold: 6
     successThreshold: 1
-  # Liveness probe configuration
-  livenessProbe:
-    initialDelaySeconds: 60
-    periodSeconds: 30
-    timeoutSeconds: 5
-    failureThreshold: 3
-    successThreshold: 1
-  # Startup probe configuration (Kubernetes 1.18+)
   startupProbe:
-    enabled: true
+    enabled: false
     initialDelaySeconds: 5
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 30
     successThreshold: 1
 
-# =============================================================================
-# Scheduling Configuration
-# =============================================================================
+# Security context
+podSecurityContext: {}
+  # fsGroup: 2000
 
-# Node selector for pod scheduling (key-value pairs)
-# Example:
-# nodeSelector:
-#   kubernetes.io/os: linux
-#   node-type: dns-server
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# Resources
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# Node selector
 nodeSelector: {}
 
-# Tolerations for pod scheduling on tainted nodes
-# Example:
-# tolerations:
-# - key: "dedicated"
-#   operator: "Equal"
-#   value: "dns"
-#   effect: "NoSchedule"
+# Tolerations
 tolerations: []
 
-# Affinity rules for pod scheduling
-# Example:
-# affinity:
-#   nodeAffinity:
-#     requiredDuringSchedulingIgnoredDuringExecution:
-#       nodeSelectorTerms:
-#       - matchExpressions:
-#         - key: kubernetes.io/os
-#           operator: In
-#           values:
-#           - linux
+# Affinity
 affinity: {}
 
-# =============================================================================
-# Additional Configuration
-# =============================================================================
-
-# Additional environment variables to pass to the container
-# Example:
-# extraEnvVars:
-#   - name: TZ
-#     value: "Europe/Paris"
-#   - name: LOG_LEVEL
-#     value: "INFO"
+# Extra environment variables
 extraEnvVars: []
 
-# Additional volumes to mount into the pod
-# Example:
-# extraVolumes:
-#   - name: config-volume
-#     configMap:
-#       name: adguard-config
+# Extra volumes
 extraVolumes: []
 
-# Additional volume mounts for the container
-# Example:
-# extraVolumeMounts:
-#   - name: config-volume
-#     mountPath: /opt/adguardhome/custom
+# Extra volume mounts
 extraVolumeMounts: []
-
-# Additional Kubernetes manifests to deploy alongside the chart
-# These will be rendered as separate YAML documents
-# Example:
-# extraManifests:
-#   - apiVersion: v1
-#     kind: ConfigMap
-#     metadata:
-#       name: {{ include "adguard-home.fullname" . }}-extra-config
-#     data:
-#       config.yaml: |
-#         key: value
-#   - apiVersion: v1
-#     kind: Secret
-#     metadata:
-#       name: {{ include "adguard-home.fullname" . }}-extra-secret
-#     type: Opaque
-#     data:
-#       key: dmFsdWU=  # base64 encoded
-extraManifests: []

@@ -2,10 +2,62 @@ suite: test service configuration
 templates:
   - service.yaml
 tests:
-  - it: should render ClusterIP service by default
+  - it: should render DNS service with LoadBalancer type by default
     asserts:
       - isKind:
           of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-dns
+      - equal:
+          path: spec.type
+          value: LoadBalancer
+      - equal:
+          path: spec.ports[0].name
+          value: dns
+      - equal:
+          path: spec.ports[0].port
+          value: 53
+      - equal:
+          path: spec.ports[0].protocol
+          value: UDP
+      - equal:
+          path: spec.ports[1].name
+          value: dns-tcp
+      - equal:
+          path: spec.ports[1].port
+          value: 53
+      - equal:
+          path: spec.ports[1].protocol
+          value: TCP
+
+  - it: should render DHCP service with LoadBalancer type by default
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-dhcp
+      - equal:
+          path: spec.type
+          value: LoadBalancer
+      - equal:
+          path: spec.ports[0].name
+          value: dhcp-server
+      - equal:
+          path: spec.ports[0].port
+          value: 67
+      - equal:
+          path: spec.ports[0].protocol
+          value: UDP
+
+  - it: should render Admin service with ClusterIP type by default
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-admin
       - equal:
           path: spec.type
           value: ClusterIP
@@ -16,73 +68,102 @@ tests:
           path: spec.ports[0].port
           value: 80
       - equal:
-          path: spec.ports[0].targetPort
-          value: http
-      - equal:
-          path: spec.ports[1].name
-          value: https
-      - equal:
-          path: spec.ports[1].port
-          value: 443
-      - equal:
-          path: spec.ports[1].targetPort
-          value: https
-      - equal:
-          path: spec.ports[2].name
-          value: dns
-      - equal:
-          path: spec.ports[2].port
-          value: 53
-      - equal:
-          path: spec.ports[2].targetPort
-          value: dns
-      - equal:
-          path: spec.ports[3].name
-          value: dns-tcp
-      - equal:
-          path: spec.ports[3].port
-          value: 53
-      - equal:
-          path: spec.ports[3].targetPort
-          value: dns-tcp
-      - equal:
-          path: spec.ports[4].name
-          value: dns-tls
-      - equal:
-          path: spec.ports[4].port
-          value: 853
-      - equal:
-          path: spec.ports[4].targetPort
-          value: dns-tls
+          path: spec.ports[0].protocol
+          value: TCP
 
-  - it: should render LoadBalancer service when specified
-    set:
-      service.type: LoadBalancer
+  - it: should render DNS over TLS service with LoadBalancer type by default
     asserts:
       - isKind:
           of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-dns-over-tls
+      - equal:
+          path: spec.type
+          value: LoadBalancer
+      - equal:
+          path: spec.ports[0].name
+          value: dns-tls
+      - equal:
+          path: spec.ports[0].port
+          value: 853
+      - equal:
+          path: spec.ports[0].protocol
+          value: TCP
+
+  - it: should render DNS over QUIC service with LoadBalancer type by default
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-dns-over-quic
+      - equal:
+          path: spec.type
+          value: LoadBalancer
+      - equal:
+          path: spec.ports[0].name
+          value: dns-quic-784
+      - equal:
+          path: spec.ports[0].port
+          value: 784
+      - equal:
+          path: spec.ports[0].protocol
+          value: UDP
+
+  - it: should render DNSCrypt service with LoadBalancer type by default
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-dnscrypt
+      - equal:
+          path: spec.type
+          value: LoadBalancer
+      - equal:
+          path: spec.ports[0].name
+          value: dnscrypt-tcp
+      - equal:
+          path: spec.ports[0].port
+          value: 5443
+      - equal:
+          path: spec.ports[0].protocol
+          value: TCP
+
+  - it: should allow custom service types
+    set:
+      services.dns.type: NodePort
+      services.admin.type: LoadBalancer
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-dns
+      - equal:
+          path: spec.type
+          value: NodePort
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-admin
       - equal:
           path: spec.type
           value: LoadBalancer
 
-  - it: should render NodePort service when specified
-    set:
-      service.type: NodePort
-    asserts:
-      - isKind:
-          of: Service
-      - equal:
-          path: spec.type
-          value: NodePort
-
   - it: should include service annotations when specified
     set:
-      service.annotations:
+      services.dns.annotations:
         service.beta.kubernetes.io/aws-load-balancer-type: nlb
         service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
     asserts:
       - isKind:
           of: Service
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-dns
       - equal:
           path: metadata.annotations["service.beta.kubernetes.io/aws-load-balancer-type"]
           value: nlb
@@ -90,16 +171,40 @@ tests:
           path: metadata.annotations["service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled"]
           value: "true"
 
-  - it: should use custom port when specified
+  - it: should allow custom ports
     set:
-      service.port: 8080
-      service.httpsPort: 8443
+      services.admin.ports.http.port: 8080
+      services.dns.ports.dns.port: 5353
     asserts:
       - isKind:
           of: Service
       - equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-admin
+      - equal:
           path: spec.ports[0].port
           value: 8080
+      - isKind:
+          of: Service
       - equal:
-          path: spec.ports[1].port
-          value: 8443
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-dns
+      - equal:
+          path: spec.ports[0].port
+          value: 5353
+
+  - it: should disable services when set to false
+    set:
+      services.dns.enabled: false
+      services.dhcp.enabled: false
+    asserts:
+      - not:
+          isKind:
+            of: Service
+        template: service.yaml
+        documentIndex: 0
+      - not:
+          isKind:
+            of: Service
+        template: service.yaml
+        documentIndex: 1

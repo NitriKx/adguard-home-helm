@@ -1,6 +1,7 @@
-{{- if .Values.ingress.enabled -}}
+{{- if and .Values.ingress.enabled .Values.services.admin.enabled -}}
 {{- $fullName := include "adguard-home.fullname" . -}}
-{{- $svcPort := .Values.service.port -}}
+{{- $adminSvcName := printf "%s-admin" $fullName -}}
+{{- $svcPort := .Values.services.admin.ports.http.port -}}
 {{- if and .Values.ingress.className (not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class")) }}
   {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
 {{- end }}
@@ -40,7 +41,7 @@ spec:
           {{- end }}
           backend:
             service:
-              name: {{ $fullName }}
+              name: {{ $adminSvcName }}
               port:
                 number: {{ $svcPort }}
         {{- end }}
