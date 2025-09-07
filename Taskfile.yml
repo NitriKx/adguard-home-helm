@@ -20,6 +20,11 @@ tasks:
     cmds:
       - helm template {{.RELEASE_NAME}} {{.CHART_DIR}}
 
+  test:
+    desc: Render chart templates with default values
+    cmds:
+      - helm unittest {{.CHART_DIR}}/
+
   package:
     desc: Package the Helm chart
     cmds:

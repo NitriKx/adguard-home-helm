@@ -1,4 +1,4 @@
-{{- if .Values.services.dns.enabled -}}
+{{- if .Values.services.dns.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -26,7 +26,7 @@ spec:
   selector:
     {{- include "adguard-home.selectorLabels" . | nindent 4 }}
 {{- end }}
-{{- if .Values.services.dhcp.enabled -}}
+{{- if .Values.services.dhcp.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -54,7 +54,7 @@ spec:
   selector:
     {{- include "adguard-home.selectorLabels" . | nindent 4 }}
 {{- end }}
-{{- if .Values.services.admin.enabled -}}
+{{- if .Values.services.admin.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -82,7 +82,7 @@ spec:
   selector:
     {{- include "adguard-home.selectorLabels" . | nindent 4 }}
 {{- end }}
-{{- if .Values.services.dnsOverTLS.enabled -}}
+{{- if .Values.services.dnsOverTLS.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -110,7 +110,7 @@ spec:
   selector:
     {{- include "adguard-home.selectorLabels" . | nindent 4 }}
 {{- end }}
-{{- if .Values.services.dnsOverQUIC.enabled -}}
+{{- if .Values.services.dnsOverQUIC.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -138,7 +138,7 @@ spec:
   selector:
     {{- include "adguard-home.selectorLabels" . | nindent 4 }}
 {{- end }}
-{{- if .Values.services.dnsCrypt.enabled -}}
+{{- if .Values.services.dnsCrypt.enabled }}
 ---
 apiVersion: v1
 kind: Service

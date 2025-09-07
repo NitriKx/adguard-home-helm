@@ -22,13 +22,13 @@ tests:
           value: 443
       - equal:
           path: spec.template.spec.containers[0].ports[2].containerPort
-          value: 53
+          value: 443
       - equal:
           path: spec.template.spec.containers[0].ports[3].containerPort
-          value: 53
+          value: 3000
       - equal:
           path: spec.template.spec.containers[0].ports[4].containerPort
-          value: 853
+          value: 53
       - equal:
           path: spec.template.spec.containers[0].readinessProbe.httpGet.path
           value: /
@@ -37,7 +37,7 @@ tests:
           value: http
       - equal:
           path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
-          value: 30
+          value: 5
       - equal:
           path: spec.template.spec.containers[0].livenessProbe.httpGet.path
           value: /
@@ -46,7 +46,7 @@ tests:
           value: http
       - equal:
           path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
-          value: 60
+          value: 30
       - equal:
           path: spec.template.spec.containers[0].env[0].name
           value: TZ
@@ -59,28 +59,20 @@ suite: test default service configuration
 templates:
   - service.yaml
 tests:
-  - it: should render service with default values
+  - it: should render DNS service with default values
+    documentIndex: 0
     asserts:
       - isKind:
           of: Service
       - equal:
           path: spec.type
-          value: ClusterIP
+          value: LoadBalancer
       - equal:
           path: spec.ports[0].port
-          value: 80
+          value: 53
       - equal:
           path: spec.ports[1].port
-          value: 443
-      - equal:
-          path: spec.ports[2].port
           value: 53
-      - equal:
-          path: spec.ports[3].port
-          value: 53
-      - equal:
-          path: spec.ports[4].port
-          value: 853
 
 ---
 suite: test default PVC configuration
@@ -97,7 +89,7 @@ tests:
           value: ReadWriteOnce
       - equal:
           path: spec.resources.requests.storage
-          value: 1Gi
+          value: 5Gi
       - notExists:
           path: spec.volumeName
 

@@ -19,7 +19,7 @@ tests:
           value: ReadWriteOnce
       - equal:
           path: spec.resources.requests.storage
-          value: 1Gi
+          value: 5Gi
 
   - it: should create work PVC with volume name
     set:
@@ -55,14 +55,15 @@ tests:
           value: ReadWriteOnce
       - equal:
           path: spec.resources.requests.storage
-          value: 1Gi
+          value: 5Gi
 
   - it: should create PVC with custom storage class and size
     set:
       persistence.enabled: true
       persistence.config.storageClass: "fast-ssd"
       persistence.config.size: "5Gi"
-      persistence.config.accessMode: "ReadWriteMany"
+      persistence.config.accessModes:
+        - "ReadWriteMany"
     documentIndex: 0
     asserts:
       - isKind:

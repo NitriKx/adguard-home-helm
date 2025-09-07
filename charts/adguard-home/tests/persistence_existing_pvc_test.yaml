@@ -79,4 +79,4 @@ tests:
           value: ReadWriteOnce
       - equal:
           path: spec.resources.requests.storage
-          value: 1Gi
+          value: 5Gi

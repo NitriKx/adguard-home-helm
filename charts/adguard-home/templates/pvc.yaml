@@ -12,7 +12,7 @@ metadata:
   {{- end }}
 spec:
   accessModes:
-    - {{ .Values.persistence.config.accessMode }}
+    {{- toYaml .Values.persistence.config.accessModes | nindent 4 }}
   resources:
     requests:
       storage: {{ .Values.persistence.config.size }}
@@ -37,7 +37,7 @@ metadata:
   {{- end }}
 spec:
   accessModes:
-    - {{ .Values.persistence.work.accessMode }}
+    {{- toYaml .Values.persistence.work.accessModes | nindent 4 }}
   resources:
     requests:
       storage: {{ .Values.persistence.work.size }}

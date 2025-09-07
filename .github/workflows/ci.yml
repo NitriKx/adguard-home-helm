@@ -38,7 +38,7 @@ jobs:
     - name: Cache Helm dependencies
       uses: actions/cache@v3
       with:
-        path: ~/Library/Caches/helm/repository
+        path: ~/.cache/helm/repository
         key: ${{ runner.os }}-helm-${{ hashFiles('**/Chart.yaml') }}
         restore-keys: |
           ${{ runner.os }}-helm-

@@ -3,6 +3,7 @@ templates:
   - service.yaml
 tests:
   - it: should render DNS service with LoadBalancer type by default
+    documentIndex: 0
     asserts:
       - isKind:
           of: Service
@@ -32,6 +33,7 @@ tests:
           value: TCP
 
   - it: should render DHCP service with LoadBalancer type by default
+    documentIndex: 1
     asserts:
       - isKind:
           of: Service
@@ -43,15 +45,16 @@ tests:
           value: LoadBalancer
       - equal:
           path: spec.ports[0].name
-          value: dhcp-server
+          value: dhcp-client-tcp
       - equal:
           path: spec.ports[0].port
-          value: 67
+          value: 68
       - equal:
           path: spec.ports[0].protocol
-          value: UDP
+          value: TCP
 
   - it: should render Admin service with ClusterIP type by default
+    documentIndex: 2
     asserts:
       - isKind:
           of: Service
@@ -72,6 +75,7 @@ tests:
           value: TCP
 
   - it: should render DNS over TLS service with LoadBalancer type by default
+    documentIndex: 3
     asserts:
       - isKind:
           of: Service
@@ -92,6 +96,7 @@ tests:
           value: TCP
 
   - it: should render DNS over QUIC service with LoadBalancer type by default
+    documentIndex: 4
     asserts:
       - isKind:
           of: Service
@@ -112,6 +117,7 @@ tests:
           value: UDP
 
   - it: should render DNSCrypt service with LoadBalancer type by default
+    documentIndex: 5
     asserts:
       - isKind:
           of: Service
@@ -136,20 +142,26 @@ tests:
       services.dns.type: NodePort
       services.admin.type: LoadBalancer
     asserts:
-      - isKind:
+      - documentIndex: 0
+        isKind:
           of: Service
-      - equal:
+      - documentIndex: 0
+        equal:
           path: metadata.name
           value: RELEASE-NAME-adguard-home-dns
-      - equal:
+      - documentIndex: 0
+        equal:
           path: spec.type
           value: NodePort
-      - isKind:
+      - documentIndex: 2
+        isKind:
           of: Service
-      - equal:
+      - documentIndex: 2
+        equal:
           path: metadata.name
           value: RELEASE-NAME-adguard-home-admin
-      - equal:
+      - documentIndex: 2
+        equal:
           path: spec.type
           value: LoadBalancer
 
@@ -159,15 +171,19 @@ tests:
         service.beta.kubernetes.io/aws-load-balancer-type: nlb
         service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
     asserts:
-      - isKind:
+      - documentIndex: 0
+        isKind:
           of: Service
-      - equal:
+      - documentIndex: 0
+        equal:
           path: metadata.name
           value: RELEASE-NAME-adguard-home-dns
-      - equal:
+      - documentIndex: 0
+        equal:
           path: metadata.annotations["service.beta.kubernetes.io/aws-load-balancer-type"]
           value: nlb
-      - equal:
+      - documentIndex: 0
+        equal:
           path: metadata.annotations["service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled"]
           value: "true"
 
@@ -176,20 +192,26 @@ tests:
       services.admin.ports.http.port: 8080
       services.dns.ports.dns.port: 5353
     asserts:
-      - isKind:
+      - documentIndex: 2
+        isKind:
           of: Service
-      - equal:
+      - documentIndex: 2
+        equal:
           path: metadata.name
           value: RELEASE-NAME-adguard-home-admin
-      - equal:
+      - documentIndex: 2
+        equal:
           path: spec.ports[0].port
           value: 8080
-      - isKind:
+      - documentIndex: 0
+        isKind:
           of: Service
-      - equal:
+      - documentIndex: 0
+        equal:
           path: metadata.name
           value: RELEASE-NAME-adguard-home-dns
-      - equal:
+      - documentIndex: 0
+        equal:
           path: spec.ports[0].port
           value: 5353
 
@@ -198,13 +220,17 @@ tests:
       services.dns.enabled: false
       services.dhcp.enabled: false
     asserts:
-      - not:
-          isKind:
-            of: Service
-        template: service.yaml
-        documentIndex: 0
-      - not:
-          isKind:
-            of: Service
-        template: service.yaml
-        documentIndex: 1
+      - documentIndex: 0
+        isKind:
+          of: Service
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-admin
+      - documentIndex: 1
+        isKind:
+          of: Service
+      - documentIndex: 1
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-adguard-home-dns-over-tls

@@ -261,6 +261,7 @@ ingress:
 
 # Persistence configuration
 persistence:
+  enabled: true
   config:
     enabled: true
     size: 5Gi
@@ -300,16 +301,19 @@ healthCheck:
     successThreshold: 1
 
 # Security context
-podSecurityContext: {}
-  # fsGroup: 2000
+podSecurityContext:
+  fsGroup: 1000
+  runAsNonRoot: true
+  runAsUser: 1000
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop:
+      - ALL
 
 # Resources
 resources: {}
