@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/NitriKx/adguard-home-helm/compare/v1.0.0...v1.1.0) (2025-09-07)
+
+
+### Features
+
+* initial import ([6dfba16](https://github.com/NitriKx/adguard-home-helm/commit/6dfba160f8d53897376f7c41f8c8018911342561))
+* update chart-releaser ([696c9b9](https://github.com/NitriKx/adguard-home-helm/commit/696c9b9359247f954dfe99a2f8982ad7e8bbc7bd))
+
 ## 1.0.0 (2025-09-06)
 
 
