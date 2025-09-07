@@ -2,8 +2,8 @@ apiVersion: v2
 name: adguard-home
 description: A Helm chart for deploying AdGuard Home DNS server
 type: application
-version: 1.0.0
-appVersion: "v0.107.43"
+version: 1.1.0
+appVersion: "0.107.65"
 kubeVersion: ">=1.20.0"
 keywords:
   - dns
@@ -14,6 +14,7 @@ home: https://adguard.com/en/adguard-home/overview.html
 sources:
   - https://github.com/AdguardTeam/AdGuardHome
   - https://hub.docker.com/r/adguard/adguardhome
+  - https://github.com/11notes/docker-adguard
   - https://github.com/NitriKx/adguard-home-helm
 maintainers:
   - name: NitriKx

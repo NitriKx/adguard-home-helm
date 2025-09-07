@@ -1,6 +1,6 @@
 # adguard-home
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.107.43](https://img.shields.io/badge/AppVersion-v0.107.43-informational?style=flat-square)
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.107.65](https://img.shields.io/badge/AppVersion-0.107.65-informational?style=flat-square)
 
 A Helm chart for deploying AdGuard Home DNS server
 
@@ -16,6 +16,7 @@ A Helm chart for deploying AdGuard Home DNS server
 
 * <https://github.com/AdguardTeam/AdGuardHome>
 * <https://hub.docker.com/r/adguard/adguardhome>
+* <https://github.com/11notes/docker-adguard>
 * <https://github.com/NitriKx/adguard-home-helm>
 
 ## Requirements
@@ -49,7 +50,7 @@ Kubernetes: `>=1.20.0`
 | healthCheck.startupProbe.successThreshold | int | `1` |  |
 | healthCheck.startupProbe.timeoutSeconds | int | `5` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"adguard/adguardhome"` |  |
+| image.repository | string | `"11notes/adguard"` |  |
 | image.tag | string | `""` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |

@@ -13,7 +13,7 @@ tests:
           value: 1
       - equal:
           path: spec.template.spec.containers[0].image
-          value: adguard/adguardhome:v0.107.43
+          value: 11notes/adguard:v0.107.43
       - equal:
           path: spec.template.spec.containers[0].ports[0].containerPort
           value: 80
@@ -214,6 +214,97 @@ tests:
       - equal:
           path: spec.replicas
           value: 2
+
+---
+suite: test extra environment variables
+templates:
+  - deployment.yaml
+tests:
+  - it: should include extra environment variables when specified
+    set:
+      extraEnvVars:
+        - name: CUSTOM_VAR
+          value: "test_value"
+        - name: ANOTHER_VAR
+          valueFrom:
+            secretKeyRef:
+              name: my-secret
+              key: my-key
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].env[1].name
+          value: CUSTOM_VAR
+      - equal:
+          path: spec.template.spec.containers[0].env[1].value
+          value: test_value
+      - equal:
+          path: spec.template.spec.containers[0].env[2].name
+          value: ANOTHER_VAR
+      - exists:
+          path: spec.template.spec.containers[0].env[2].valueFrom
+
+---
+suite: test startup probe configuration
+templates:
+  - deployment.yaml
+tests:
+  - it: should not include startup probe when disabled
+    set:
+      healthCheck.enabled: true
+      healthCheck.startupProbe.enabled: false
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
+
+  - it: should not include startup probe when enabled but capability not available
+    set:
+      healthCheck.enabled: true
+      healthCheck.startupProbe.enabled: true
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.template.spec.containers[0].startupProbe
+
+---
+suite: test custom image configuration
+templates:
+  - deployment.yaml
+tests:
+  - it: should use custom image tag when specified
+    set:
+      image.tag: "v0.108.0"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: 11notes/adguard:v0.108.0
+
+  - it: should use custom image repository and tag
+    set:
+      image.repository: "custom/adguard"
+      image.tag: "latest"
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: custom/adguard:latest
+
+  - it: should use default tag when image.tag is empty
+    set:
+      image.tag: ""
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: 11notes/adguard:0.107.65
 
 ---
 suite: test PVC with StatefulSet
