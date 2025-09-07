@@ -59,7 +59,7 @@ repos:
 
       - id: helm-unittest
         name: Helm Unit Tests
-        entry: bash -c 'helm unittest charts/adguard-home'
+        entry: bash -c 'if ! helm plugin list | grep -q unittest; then echo "Installing helm-unittest plugin..."; helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v0.3.4; fi; helm unittest charts/adguard-home'
         language: system
         files: ^(charts/adguard-home/(Chart\.yaml|values\.yaml|templates/.*\.yaml|tests/.*\.yaml))$
         pass_filenames: false
