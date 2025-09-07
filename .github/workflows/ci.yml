@@ -31,6 +31,11 @@ jobs:
       with:
         version: v3.12.0
 
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
     - name: Setup helm-unittest plugin
       run: |
         helm plugin install https://github.com/helm-unittest/helm-unittest.git --version v0.3.4
@@ -43,20 +48,8 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-helm-
 
-    - name: Run Helm lint
-      run: |
-        echo "🔍 Running Helm lint..."
-        helm lint charts/adguard-home
-
-    - name: Run Helm unit tests
-      run: |
-        echo "🧪 Running Helm unit tests..."
-        helm unittest charts/adguard-home
-
-    - name: Test chart templating
-      run: |
-        echo "📋 Testing chart templating..."
-        helm template test charts/adguard-home > /dev/null
+    - name: Run pre-commit checks
+      uses: pre-commit/action@v3.0.1
 
     - name: Test chart templating with custom values
       run: |
@@ -79,10 +72,6 @@ jobs:
         helm template test charts/adguard-home --kube-version ${{ matrix.kubernetes-version }} > /dev/null
         echo "✅ Compatible with Kubernetes ${{ matrix.kubernetes-version }}"
 
-    - name: Validate chart
-      run: |
-        echo "🔍 Validating chart..."
-        helm lint charts/adguard-home
 
   security-scan:
     name: Security Scan

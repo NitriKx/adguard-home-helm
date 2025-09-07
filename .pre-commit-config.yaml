@@ -8,11 +8,13 @@ repos:
     hooks:
       - id: trailing-whitespace
         files: \.(yaml|yml)$
+        exclude: ^charts/adguard-home/templates/
       - id: end-of-file-fixer
         files: \.(yaml|yml)$
+        exclude: ^charts/adguard-home/templates/
       - id: check-yaml
         files: \.(yaml|yml)$
-        exclude: ^charts/.*templates/
+        exclude: ^charts/adguard-home/templates/
         args: [--allow-multiple-documents]
       - id: check-merge-conflict
       - id: check-added-large-files
@@ -23,7 +25,7 @@ repos:
       - id: helm-docs
         args:
           - --chart-search-root=charts
-          - --template-files=README.md.gotmpl
+        files: ^charts/adguard-home/(Chart\.yaml|values\.yaml|README\.md)$
 
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.2.0
@@ -38,14 +40,14 @@ repos:
         name: Helm Lint
         entry: bash -c 'helm lint charts/adguard-home'
         language: system
-        files: ^charts/adguard-home/
+        files: ^(charts/adguard-home/(Chart\.yaml|values\.yaml|templates/.*\.yaml|tests/.*\.yaml))$
         pass_filenames: false
 
       - id: helm-template
         name: Helm Template Validation
         entry: bash -c 'helm template test charts/adguard-home > /dev/null'
         language: system
-        files: ^charts/adguard-home/
+        files: ^(charts/adguard-home/(Chart\.yaml|values\.yaml|templates/.*\.yaml))$
         pass_filenames: false
 
       - id: helm-dependency
@@ -53,4 +55,11 @@ repos:
         entry: bash -c 'helm dependency list charts/adguard-home'
         language: system
         files: ^charts/adguard-home/Chart\.yaml$
+        pass_filenames: false
+
+      - id: helm-unittest
+        name: Helm Unit Tests
+        entry: bash -c 'helm unittest charts/adguard-home'
+        language: system
+        files: ^(charts/adguard-home/(Chart\.yaml|values\.yaml|templates/.*\.yaml|tests/.*\.yaml))$
         pass_filenames: false
