@@ -152,16 +152,24 @@ spec:
       volumes:
         {{- if ne .Values.workloadType "StatefulSet" }}
         - name: config
+          {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.config.existingClaim | default (printf "%s-config" (include "adguard-home.fullname" .)) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
         - name: work
+          {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.work.existingClaim | default (printf "%s-work" (include "adguard-home.fullname" .)) }}
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
         {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-  {{- if eq .Values.workloadType "StatefulSet" }}
+  {{- if and (eq .Values.workloadType "StatefulSet") .Values.persistence.enabled }}
   volumeClaimTemplates:
     - metadata:
         name: config

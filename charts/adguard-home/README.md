@@ -60,12 +60,12 @@ Kubernetes: `>=1.20.0`
 | ingress.tls | list | `[]` |  |
 | nodeSelector | object | `{}` |  |
 | persistence.config.accessModes[0] | string | `"ReadWriteOnce"` |  |
-| persistence.config.enabled | bool | `true` |  |
+| persistence.config.enabled | bool | `false` |  |
 | persistence.config.size | string | `"5Gi"` |  |
 | persistence.config.storageClass | string | `""` |  |
-| persistence.enabled | bool | `true` |  |
+| persistence.enabled | bool | `false` |  |
 | persistence.work.accessModes[0] | string | `"ReadWriteOnce"` |  |
-| persistence.work.enabled | bool | `true` |  |
+| persistence.work.enabled | bool | `false` |  |
 | persistence.work.size | string | `"1Gi"` |  |
 | persistence.work.storageClass | string | `""` |  |
 | podSecurityContext.fsGroup | int | `1000` |  |

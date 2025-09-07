@@ -265,16 +265,16 @@ ingress:
 
 # Persistence configuration
 persistence:
-  enabled: true
+  enabled: false
   config:
-    enabled: true
+    enabled: false
     size: 5Gi
     accessModes:
       - ReadWriteOnce
     # existingClaim: ""
     storageClass: ""
   work:
-    enabled: true
+    enabled: false
     size: 1Gi
     accessModes:
       - ReadWriteOnce
