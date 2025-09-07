@@ -49,3 +49,14 @@ Selector labels
 app.kubernetes.io/name: {{ include "adguard-home.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Workload kind
+*/}}
+{{- define "adguard-home.workloadKind" -}}
+{{- if eq .Values.workloadType "StatefulSet" -}}
+StatefulSet
+{{- else -}}
+Deployment
+{{- end }}
+{{- end }}

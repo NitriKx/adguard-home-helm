@@ -33,6 +33,8 @@ The following table lists the configurable parameters of the AdGuard Home chart 
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
+| `workloadType` | Workload type: Deployment or StatefulSet | `Deployment` |
+| `replicas` | Number of replicas | `1` |
 | `image.repository` | AdGuard Home image repository | `adguard/adguardhome` |
 | `image.tag` | AdGuard Home image tag (uses Chart appVersion if empty) | `""` (uses appVersion) |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
@@ -167,6 +169,43 @@ image:
 ```
 
 If `image.tag` is left empty or not specified, it will automatically use the version defined in the Chart's `appVersion` field.
+
+### Workload Configuration
+
+#### Deployment vs StatefulSet
+
+The chart supports both Kubernetes Deployment and StatefulSet workload types:
+
+**Deployment** (default):
+- Suitable for stateless or simple stateful applications
+- Uses separate PersistentVolumeClaims for storage
+- Easier scaling and rolling updates
+- No persistent pod identity
+
+**StatefulSet**:
+- Suitable for stateful applications requiring persistent identity
+- Uses volumeClaimTemplates for automatic PVC creation
+- Ordered deployment and scaling
+- Stable network identity and storage
+
+```yaml
+# Use StatefulSet with 2 replicas
+workloadType: StatefulSet
+replicas: 2
+
+# Use Deployment with 3 replicas (default)
+workloadType: Deployment
+replicas: 3
+```
+
+**Important Notes:**
+- When using StatefulSet, PVCs are managed automatically via volumeClaimTemplates
+- The chart will not create separate PVC resources when StatefulSet is selected
+- StatefulSet provides stable pod names (e.g., `adguard-home-0`, `adguard-home-1`)
+- Consider using StatefulSet if you need:
+  - Persistent pod identity
+  - Ordered deployment/scaling
+  - Stable storage that survives pod rescheduling
 
 ### Example Configuration
 

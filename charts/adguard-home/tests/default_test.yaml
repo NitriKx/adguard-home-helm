@@ -186,3 +186,64 @@ tests:
       - equal:
           path: spec.template.spec.initContainers[0].volumeMounts[0].mountPath
           value: /opt/adguardhome/conf
+
+---
+suite: test StatefulSet configuration
+templates:
+  - deployment.yaml
+tests:
+  - it: should render StatefulSet when workloadType is StatefulSet
+    set:
+      workloadType: StatefulSet
+    asserts:
+      - isKind:
+          of: StatefulSet
+      - equal:
+          path: spec.serviceName
+          value: RELEASE-NAME-adguard-home
+      - equal:
+          path: spec.replicas
+          value: 1
+      - exists:
+          path: spec.volumeClaimTemplates
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.name
+          value: config
+      - equal:
+          path: spec.volumeClaimTemplates[1].metadata.name
+          value: work
+      - notExists:
+          path: spec.template.spec.volumes[0].persistentVolumeClaim
+
+  - it: should render Deployment with custom replicas
+    set:
+      replicas: 3
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: should render StatefulSet with custom replicas
+    set:
+      workloadType: StatefulSet
+      replicas: 2
+    asserts:
+      - isKind:
+          of: StatefulSet
+      - equal:
+          path: spec.replicas
+          value: 2
+
+---
+suite: test PVC with StatefulSet
+templates:
+  - pvc.yaml
+tests:
+  - it: should not render PVCs when using StatefulSet
+    set:
+      workloadType: StatefulSet
+    asserts:
+      - hasDocuments:
+          count: 0

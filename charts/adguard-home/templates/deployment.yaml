@@ -1,11 +1,14 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: {{ include "adguard-home.workloadKind" . }}
 metadata:
   name: {{ include "adguard-home.fullname" . }}
   labels:
     {{- include "adguard-home.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  {{- if eq .Values.workloadType "StatefulSet" }}
+  serviceName: {{ include "adguard-home.fullname" . }}
+  {{- end }}
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       {{- include "adguard-home.selectorLabels" . | nindent 6 }}
@@ -147,15 +150,54 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
       volumes:
+        {{- if ne .Values.workloadType "StatefulSet" }}
         - name: config
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.config.existingClaim | default (printf "%s-config" (include "adguard-home.fullname" .)) }}
         - name: work
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.work.existingClaim | default (printf "%s-work" (include "adguard-home.fullname" .)) }}
+        {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+  {{- if eq .Values.workloadType "StatefulSet" }}
+  volumeClaimTemplates:
+    - metadata:
+        name: config
+        labels:
+          {{- include "adguard-home.labels" . | nindent 10 }}
+        {{- with .Values.persistence.config.annotations }}
+        annotations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+          {{- toYaml .Values.persistence.config.accessModes | nindent 10 }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.config.size }}
+        {{- if .Values.persistence.config.storageClass }}
+        storageClassName: {{ .Values.persistence.config.storageClass }}
+        {{- end }}
+    - metadata:
+        name: work
+        labels:
+          {{- include "adguard-home.labels" . | nindent 10 }}
+        {{- with .Values.persistence.work.annotations }}
+        annotations:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      spec:
+        accessModes:
+          {{- toYaml .Values.persistence.work.accessModes | nindent 10 }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.work.size }}
+        {{- if .Values.persistence.work.storageClass }}
+        storageClassName: {{ .Values.persistence.work.storageClass }}
+        {{- end }}
+  {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

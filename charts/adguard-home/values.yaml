@@ -2,6 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# Workload configuration
+workloadType: Deployment  # Deployment or StatefulSet
+replicas: 1
+
 # AdGuard Home configuration
 adguardHome:
   # Timezone for the container
