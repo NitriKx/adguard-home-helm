@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/NitriKx/adguard-home-helm/compare/v1.0.0...v1.0.1) (2025-09-07)
+
+
+### Bug Fixes
+
+* add maintainer to the Chart ([1e3d379](https://github.com/NitriKx/adguard-home-helm/commit/1e3d379eeb5b7d63f58e11498dca56d456cf9e9c))
+
 ## 1.0.0 (2025-09-07)
 
 
