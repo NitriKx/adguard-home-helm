@@ -1,0 +1,27 @@
+apiVersion: v1
+entries:
+  adguard-home:
+  - apiVersion: v2
+    appVersion: v0.107.43
+    created: "2025-09-07T11:23:27.201618499Z"
+    description: A Helm chart for deploying AdGuard Home DNS server
+    digest: 118c00294f4f1c53b6959370c4daf20428a3ff527bd07889700d529fdc215762
+    home: https://adguard.com/en/adguard-home/overview.html
+    keywords:
+    - dns
+    - adblock
+    - network
+    - adguard
+    kubeVersion: '>=1.20.0'
+    maintainers:
+    - name: NitriKx
+    name: adguard-home
+    sources:
+    - https://github.com/AdguardTeam/AdGuardHome
+    - https://hub.docker.com/r/adguard/adguardhome
+    - https://github.com/NitriKx/adguard-home-helm
+    type: application
+    urls:
+    - https://github.com/NitriKx/adguard-home-helm/releases/download/adguard-home-1.0.0/adguard-home-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-09-07T11:23:27.201624041Z"
