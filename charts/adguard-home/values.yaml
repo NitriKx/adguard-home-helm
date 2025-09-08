@@ -12,7 +12,7 @@ adguardHome:
   timezone: UTC
   # AdGuard Home configuration YAML (overwrite the existing configuration in your PVC)
   # You must have the configuration already present in your PVC if you disable this.
-  configYaml: |
+  configYaml:
     dns:
       bind_hosts:
         - 0.0.0.0

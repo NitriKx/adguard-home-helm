@@ -151,7 +151,7 @@ tests:
   - it: should create init container when configYaml is specified
     set:
       adguardHome:
-        configYaml: |
+        configYaml:
           bind_host: 0.0.0.0
           bind_port: 80
     asserts:

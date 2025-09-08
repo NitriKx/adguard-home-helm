@@ -30,7 +30,7 @@ spec:
             - -c
             - |
               cat > /adguard/etc/config.yaml << 'EOF'
-              {{ .Values.adguardHome.configYaml | indent 14 }}
+{{ .Values.adguardHome.configYaml | toYaml | nindent 14 }}
               EOF
           volumeMounts:
             - name: config
