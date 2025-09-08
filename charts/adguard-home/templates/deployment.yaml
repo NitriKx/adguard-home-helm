@@ -32,6 +32,7 @@ spec:
               cat > /opt/adguardhome/conf/AdGuardHome.yaml << 'EOF'
               {{ .Values.adguardHome.configYaml | indent 14 }}
               EOF
+              chown 1000:1000 /opt/adguardhome/conf/AdGuardHome.yaml
           volumeMounts:
             - name: config
               mountPath: /opt/adguardhome/conf
