@@ -284,12 +284,15 @@ persistence:
 # Health check configuration
 healthCheck:
   enabled: true
+  # Readiness probe - checks admin web UI health via HTTP
   readinessProbe:
+    path: /control/status
     initialDelaySeconds: 5
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 6
     successThreshold: 1
+  # Liveness probe - checks DNS server health via dnslookup command
   livenessProbe:
     initialDelaySeconds: 30
     periodSeconds: 10
@@ -297,7 +300,8 @@ healthCheck:
     failureThreshold: 6
     successThreshold: 1
   startupProbe:
-    enabled: false
+    enabled: true
+    path: /control/status
     initialDelaySeconds: 5
     periodSeconds: 10
     timeoutSeconds: 5

@@ -111,21 +111,24 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- if .Values.healthCheck.enabled }}
-          # Readiness probe
+          # Readiness probe - HTTP health check
           readinessProbe:
             httpGet:
-              path: /
+              path: {{ .Values.healthCheck.readinessProbe.path | default "/" }}
               port: http
             initialDelaySeconds: {{ .Values.healthCheck.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.healthCheck.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.healthCheck.readinessProbe.timeoutSeconds }}
             failureThreshold: {{ .Values.healthCheck.readinessProbe.failureThreshold }}
             successThreshold: {{ .Values.healthCheck.readinessProbe.successThreshold }}
-          # Liveness probe
+          # Liveness probe - DNS health check
           livenessProbe:
-            httpGet:
-              path: /
-              port: http
+            exec:
+              command:
+                - /usr/local/bin/dnslookup
+                - .
+                - NS
+                - 127.0.0.1
             initialDelaySeconds: {{ .Values.healthCheck.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.healthCheck.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.healthCheck.livenessProbe.timeoutSeconds }}
@@ -135,7 +138,7 @@ spec:
           # Startup probe (Kubernetes 1.18+)
           startupProbe:
             httpGet:
-              path: /
+              path: {{ .Values.healthCheck.startupProbe.path | default "/" }}
               port: http
             initialDelaySeconds: {{ .Values.healthCheck.startupProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.healthCheck.startupProbe.periodSeconds }}

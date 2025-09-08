@@ -31,7 +31,7 @@ tests:
           value: 53
       - equal:
           path: spec.template.spec.containers[0].readinessProbe.httpGet.path
-          value: /
+          value: /control/status
       - equal:
           path: spec.template.spec.containers[0].readinessProbe.httpGet.port
           value: http
@@ -39,11 +39,17 @@ tests:
           path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
           value: 5
       - equal:
-          path: spec.template.spec.containers[0].livenessProbe.httpGet.path
-          value: /
+          path: spec.template.spec.containers[0].livenessProbe.exec.command[0]
+          value: /usr/local/bin/dnslookup
       - equal:
-          path: spec.template.spec.containers[0].livenessProbe.httpGet.port
-          value: http
+          path: spec.template.spec.containers[0].livenessProbe.exec.command[1]
+          value: .
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.exec.command[2]
+          value: NS
+      - equal:
+          path: spec.template.spec.containers[0].livenessProbe.exec.command[3]
+          value: 127.0.0.1
       - equal:
           path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
           value: 30
@@ -347,10 +353,30 @@ tests:
       - notExists:
           path: spec.template.spec.containers[0].startupProbe
 
+  - it: should include startup probe when enabled and capability available
+    set:
+      healthCheck.enabled: true
+      healthCheck.startupProbe.enabled: true
+      # This test simulates when startupProbe capability is available
+      Capabilities.APIVersions: ["startupProbe"]
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.httpGet.path
+          value: /control/status
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.httpGet.port
+          value: http
+      - equal:
+          path: spec.template.spec.containers[0].startupProbe.initialDelaySeconds
+          value: 5
+
   - it: should not include startup probe when enabled but capability not available
     set:
       healthCheck.enabled: true
       healthCheck.startupProbe.enabled: true
+      # This test simulates when startupProbe capability is not available (default)
     asserts:
       - isKind:
           of: Deployment
