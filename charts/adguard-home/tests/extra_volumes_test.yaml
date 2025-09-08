@@ -15,16 +15,16 @@ tests:
       - isKind:
           of: Deployment
       - equal:
-          path: spec.template.spec.volumes[2].name
+          path: spec.template.spec.volumes[3].name
           value: extra-volume
       - equal:
-          path: spec.template.spec.volumes[2].configMap.name
+          path: spec.template.spec.volumes[3].configMap.name
           value: my-configmap
       - equal:
-          path: spec.template.spec.volumes[3].name
+          path: spec.template.spec.volumes[4].name
           value: secret-volume
       - equal:
-          path: spec.template.spec.volumes[3].secret.secretName
+          path: spec.template.spec.volumes[4].secret.secretName
           value: my-secret
 
   - it: should include extra volume mounts when specified
@@ -39,19 +39,19 @@ tests:
       - isKind:
           of: Deployment
       - equal:
-          path: spec.template.spec.containers[0].volumeMounts[2].name
+          path: spec.template.spec.containers[0].volumeMounts[3].name
           value: extra-volume
       - equal:
-          path: spec.template.spec.containers[0].volumeMounts[2].mountPath
+          path: spec.template.spec.containers[0].volumeMounts[3].mountPath
           value: /etc/extra
       - equal:
-          path: spec.template.spec.containers[0].volumeMounts[3].name
+          path: spec.template.spec.containers[0].volumeMounts[4].name
           value: secret-volume
       - equal:
-          path: spec.template.spec.containers[0].volumeMounts[3].mountPath
+          path: spec.template.spec.containers[0].volumeMounts[4].mountPath
           value: /etc/secret
       - equal:
-          path: spec.template.spec.containers[0].volumeMounts[3].readOnly
+          path: spec.template.spec.containers[0].volumeMounts[4].readOnly
           value: true
 
   - it: should include both extra volumes and volume mounts when specified together
@@ -66,11 +66,11 @@ tests:
       - isKind:
           of: Deployment
       - equal:
-          path: spec.template.spec.volumes[2].name
+          path: spec.template.spec.volumes[3].name
           value: shared-volume
       - equal:
-          path: spec.template.spec.containers[0].volumeMounts[2].name
+          path: spec.template.spec.containers[0].volumeMounts[3].name
           value: shared-volume
       - equal:
-          path: spec.template.spec.containers[0].volumeMounts[2].mountPath
+          path: spec.template.spec.containers[0].volumeMounts[3].mountPath
           value: /tmp/shared

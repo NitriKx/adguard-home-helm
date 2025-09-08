@@ -215,6 +215,93 @@ tests:
           path: spec.replicas
           value: 2
 
+  - it: should render StatefulSet with emptyDir volumes when persistence is disabled
+    set:
+      workloadType: StatefulSet
+      persistence.enabled: false
+    asserts:
+      - isKind:
+          of: StatefulSet
+      - equal:
+          path: spec.serviceName
+          value: RELEASE-NAME-adguard-home
+      - notExists:
+          path: spec.volumeClaimTemplates
+      - equal:
+          path: spec.template.spec.volumes[0].name
+          value: run
+      - equal:
+          path: spec.template.spec.volumes[0].emptyDir.sizeLimit
+          value: 10Mi
+      - equal:
+          path: spec.template.spec.volumes[1].name
+          value: config
+      - equal:
+          path: spec.template.spec.volumes[1].emptyDir
+          value: {}
+      - equal:
+          path: spec.template.spec.volumes[2].name
+          value: work
+      - equal:
+          path: spec.template.spec.volumes[2].emptyDir
+          value: {}
+
+  - it: should render Deployment with PVC volumes when persistence is enabled
+    set:
+      workloadType: Deployment
+      persistence.enabled: true
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.volumeClaimTemplates
+      - equal:
+          path: spec.template.spec.volumes[0].name
+          value: run
+      - equal:
+          path: spec.template.spec.volumes[0].emptyDir.sizeLimit
+          value: 10Mi
+      - equal:
+          path: spec.template.spec.volumes[1].name
+          value: config
+      - equal:
+          path: spec.template.spec.volumes[1].persistentVolumeClaim.claimName
+          value: RELEASE-NAME-adguard-home-config
+      - equal:
+          path: spec.template.spec.volumes[2].name
+          value: work
+      - equal:
+          path: spec.template.spec.volumes[2].persistentVolumeClaim.claimName
+          value: RELEASE-NAME-adguard-home-work
+
+  - it: should render Deployment with emptyDir volumes when persistence is disabled
+    set:
+      workloadType: Deployment
+      persistence.enabled: false
+    asserts:
+      - isKind:
+          of: Deployment
+      - notExists:
+          path: spec.volumeClaimTemplates
+      - equal:
+          path: spec.template.spec.volumes[0].name
+          value: run
+      - equal:
+          path: spec.template.spec.volumes[0].emptyDir.sizeLimit
+          value: 10Mi
+      - equal:
+          path: spec.template.spec.volumes[1].name
+          value: config
+      - equal:
+          path: spec.template.spec.volumes[1].emptyDir
+          value: {}
+      - equal:
+          path: spec.template.spec.volumes[2].name
+          value: work
+      - equal:
+          path: spec.template.spec.volumes[2].emptyDir
+          value: {}
+
 ---
 suite: test extra environment variables
 templates:

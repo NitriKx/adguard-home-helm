@@ -29,13 +29,13 @@ spec:
             - sh
             - -c
             - |
-              cat > /opt/adguardhome/conf/AdGuardHome.yaml << 'EOF'
+              cat > /adguard/etc/config.yaml << 'EOF'
               {{ .Values.adguardHome.configYaml | indent 14 }}
               EOF
-              chown 1000:1000 /opt/adguardhome/conf/AdGuardHome.yaml
+              chown 1000:1000 /adguard/etc/config.yaml
           volumeMounts:
             - name: config
-              mountPath: /opt/adguardhome/conf
+              mountPath: /adguard/etc/
           resources:
             requests:
               cpu: 10m
@@ -101,10 +101,12 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
           volumeMounts:
+            - name: run
+              mountPath: /adguard/run/
             - name: config
-              mountPath: /opt/adguardhome/conf
+              mountPath: /adguard/etc/
             - name: work
-              mountPath: /opt/adguardhome/work
+              mountPath: /adguard/var/
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -151,6 +153,9 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
       volumes:
+        - name: run
+          emptyDir:
+            sizeLimit: 10Mi
         {{- if ne .Values.workloadType "StatefulSet" }}
         - name: config
           {{- if .Values.persistence.enabled }}
@@ -166,6 +171,11 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        {{- else if not .Values.persistence.enabled }}
+        - name: config
+          emptyDir: {}
+        - name: work
+          emptyDir: {}
         {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
