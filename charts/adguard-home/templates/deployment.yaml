@@ -57,7 +57,7 @@ spec:
             - name: https-udp
               containerPort: 443
               protocol: UDP
-            - name: http-beta
+            - name: http-init
               containerPort: 3000
               protocol: TCP
             - name: dns

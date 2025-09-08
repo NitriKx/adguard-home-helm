@@ -127,7 +127,7 @@ services:
         port: 443
         targetPort: 443
         protocol: UDP
-      http-beta:
+      http-init:
         port: 3000
         targetPort: 3000
         protocol: TCP

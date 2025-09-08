@@ -23,6 +23,41 @@ A Helm chart for deploying AdGuard Home DNS server
 
 Kubernetes: `>=1.20.0`
 
+## Installation
+
+### 1. Install the Helm Chart
+
+```bash
+helm repo add adguard-home https://nitrikx.github.io/adguard-home-helm
+helm repo update
+helm install adguard-home adguard-home/adguard-home
+```
+
+### 2. Port Forward the Initial Setup Port
+
+After installation, you need to port forward the `http-init` port (3000) to access the AdGuard Home web interface for initial setup:
+
+```bash
+# Port forward the http-init port to localhost:3000
+kubectl port-forward svc/adguard-home-admin 3000:http-init
+
+# Or if you want to use a different local port:
+kubectl port-forward svc/adguard-home-admin 8080:http-init
+```
+
+### 3. Complete Initial Setup
+
+1. Open your browser and navigate to `http://localhost:3000` (or your chosen port)
+2. Follow the AdGuard Home web interface setup wizard
+3. Configure your DNS settings, upstream servers, and other preferences
+4. Create an admin user account
+
+### 4. Access the Admin Interface
+
+Once setup is complete, you can access the admin interface through:
+- Port 80 (HTTP) - `kubectl port-forward svc/adguard-home-admin 8080:80`
+- Port 443 (HTTPS) - `kubectl port-forward svc/adguard-home-admin 8443:443`
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -76,9 +111,9 @@ Kubernetes: `>=1.20.0`
 | services.admin.annotations | object | `{}` |  |
 | services.admin.enabled | bool | `true` |  |
 | services.admin.labels | object | `{}` |  |
-| services.admin.ports.http-beta.port | int | `3000` |  |
-| services.admin.ports.http-beta.protocol | string | `"TCP"` |  |
-| services.admin.ports.http-beta.targetPort | int | `3000` |  |
+| services.admin.ports.http-init.port | int | `3000` |  |
+| services.admin.ports.http-init.protocol | string | `"TCP"` |  |
+| services.admin.ports.http-init.targetPort | int | `3000` |  |
 | services.admin.ports.http.port | int | `80` |  |
 | services.admin.ports.http.protocol | string | `"TCP"` |  |
 | services.admin.ports.http.targetPort | int | `80` |  |
