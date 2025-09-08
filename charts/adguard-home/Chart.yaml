@@ -2,7 +2,7 @@ apiVersion: v2
 name: adguard-home
 description: A Helm chart for deploying AdGuard Home DNS server
 type: application
-version: 1.1.0
+version: 1.2.0
 appVersion: "0.107.65"
 kubeVersion: ">=1.20.0"
 keywords:
