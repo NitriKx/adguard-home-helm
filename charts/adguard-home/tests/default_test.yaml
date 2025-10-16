@@ -31,7 +31,7 @@ tests:
           value: 53
       - equal:
           path: spec.template.spec.containers[0].readinessProbe.httpGet.path
-          value: /control/status
+          value: /
       - equal:
           path: spec.template.spec.containers[0].readinessProbe.httpGet.port
           value: http-admin
@@ -360,7 +360,7 @@ tests:
           of: Deployment
       - equal:
           path: spec.template.spec.containers[0].startupProbe.httpGet.path
-          value: /control/status
+          value: /
       - equal:
           path: spec.template.spec.containers[0].startupProbe.httpGet.port
           value: http-admin

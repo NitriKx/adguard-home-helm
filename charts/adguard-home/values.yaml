@@ -218,7 +218,7 @@ healthCheck:
   enabled: true
   # Readiness probe - checks admin web UI health via HTTP on port 3000
   readinessProbe:
-    path: /control/status
+    path: /
     initialDelaySeconds: 5
     periodSeconds: 10
     timeoutSeconds: 5
@@ -233,7 +233,7 @@ healthCheck:
     successThreshold: 1
   startupProbe:
     enabled: true
-    path: /control/status
+    path: /
     initialDelaySeconds: 5
     periodSeconds: 10
     timeoutSeconds: 5
