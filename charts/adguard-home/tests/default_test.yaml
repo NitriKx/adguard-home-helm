@@ -401,7 +401,7 @@ tests:
           of: Deployment
       - equal:
           path: spec.template.spec.containers[0].image
-          value: 11notes/adguard:0.107.65
+          value: 11notes/adguard:0.107.67
 
 ---
 suite: test PVC with StatefulSet
