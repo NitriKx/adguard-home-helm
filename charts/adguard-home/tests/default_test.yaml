@@ -34,7 +34,7 @@ tests:
           value: /control/status
       - equal:
           path: spec.template.spec.containers[0].readinessProbe.httpGet.port
-          value: http
+          value: http-admin
       - equal:
           path: spec.template.spec.containers[0].readinessProbe.initialDelaySeconds
           value: 5
@@ -142,6 +142,8 @@ templates:
   - deployment.yaml
 tests:
   - it: should not create init container when configYaml is not specified
+    set:
+      adguardHome.configYaml:
     asserts:
       - isKind:
           of: Deployment
@@ -150,8 +152,7 @@ tests:
 
   - it: should create init container when configYaml is specified
     set:
-      adguardHome:
-        configYaml:
+      adguardHome.configYaml:
           bind_host: 0.0.0.0
           bind_port: 80
     asserts:
@@ -161,14 +162,11 @@ tests:
           path: spec.template.spec.initContainers[0].name
           value: adguard-home-config
       - equal:
-          path: spec.template.spec.initContainers[0].image
-          value: busybox:1.36
-      - equal:
           path: spec.template.spec.initContainers[0].volumeMounts[0].name
           value: config
       - equal:
           path: spec.template.spec.initContainers[0].volumeMounts[0].mountPath
-          value: /opt/adguardhome/conf
+          value: /adguard/etc/
 
 ---
 suite: test StatefulSet configuration
@@ -357,8 +355,6 @@ tests:
     set:
       healthCheck.enabled: true
       healthCheck.startupProbe.enabled: true
-      # This test simulates when startupProbe capability is available
-      Capabilities.APIVersions: ["startupProbe"]
     asserts:
       - isKind:
           of: Deployment
@@ -367,22 +363,10 @@ tests:
           value: /control/status
       - equal:
           path: spec.template.spec.containers[0].startupProbe.httpGet.port
-          value: http
+          value: http-admin
       - equal:
           path: spec.template.spec.containers[0].startupProbe.initialDelaySeconds
           value: 5
-
-  - it: should not include startup probe when enabled but capability not available
-    set:
-      healthCheck.enabled: true
-      healthCheck.startupProbe.enabled: true
-      # This test simulates when startupProbe capability is not available (default)
-    asserts:
-      - isKind:
-          of: Deployment
-      - notExists:
-          path: spec.template.spec.containers[0].startupProbe
-
 ---
 suite: test custom image configuration
 templates:

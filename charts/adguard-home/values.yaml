@@ -127,7 +127,7 @@ services:
         port: 443
         targetPort: 443
         protocol: UDP
-      http-init:
+      http-admin:
         port: 3000
         targetPort: 3000
         protocol: TCP
@@ -216,7 +216,7 @@ persistence:
 # Health check configuration
 healthCheck:
   enabled: true
-  # Readiness probe - checks admin web UI health via HTTP
+  # Readiness probe - checks admin web UI health via HTTP on port 3000
   readinessProbe:
     path: /control/status
     initialDelaySeconds: 5

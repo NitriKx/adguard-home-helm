@@ -33,16 +33,16 @@ helm repo update
 helm install adguard-home adguard-home/adguard-home
 ```
 
-### 2. Port Forward the Initial Setup Port
+### 2. Port Forward the Admin Interface Port
 
-After installation, you need to port forward the `http-init` port (3000) to access the AdGuard Home web interface for initial setup:
+After installation, you need to port forward the admin interface port (3000) to access the AdGuard Home web interface:
 
 ```bash
-# Port forward the http-init port to localhost:3000
-kubectl port-forward svc/adguard-home-admin 3000:http-init
+# Port forward the http-admin port to localhost:3000
+kubectl port-forward svc/adguard-home-admin 3000:http-admin
 
 # Or if you want to use a different local port:
-kubectl port-forward svc/adguard-home-admin 8080:http-init
+kubectl port-forward svc/adguard-home-admin 8080:http-admin
 ```
 
 ### 3. Complete Initial Setup
@@ -54,8 +54,8 @@ kubectl port-forward svc/adguard-home-admin 8080:http-init
 
 ### 4. Access the Admin Interface
 
-Once setup is complete, you can access the admin interface through:
-- Port 80 (HTTP) - `kubectl port-forward svc/adguard-home-admin 8080:80`
+Once setup is complete, you can continue accessing the admin interface through port 3000:
+- Port 3000 (HTTP Admin) - `kubectl port-forward svc/adguard-home-admin 3000:http-admin`
 - Port 443 (HTTPS) - `kubectl port-forward svc/adguard-home-admin 8443:443`
 
 ## Values
@@ -111,9 +111,9 @@ Once setup is complete, you can access the admin interface through:
 | services.admin.annotations | object | `{}` |  |
 | services.admin.enabled | bool | `true` |  |
 | services.admin.labels | object | `{}` |  |
-| services.admin.ports.http-init.port | int | `3000` |  |
-| services.admin.ports.http-init.protocol | string | `"TCP"` |  |
-| services.admin.ports.http-init.targetPort | int | `3000` |  |
+| services.admin.ports.http-admin.port | int | `3000` |  |
+| services.admin.ports.http-admin.protocol | string | `"TCP"` |  |
+| services.admin.ports.http-admin.targetPort | int | `3000` |  |
 | services.admin.ports.http.port | int | `80` |  |
 | services.admin.ports.http.protocol | string | `"TCP"` |  |
 | services.admin.ports.http.targetPort | int | `80` |  |

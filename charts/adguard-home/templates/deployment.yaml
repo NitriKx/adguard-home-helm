@@ -57,7 +57,7 @@ spec:
             - name: https-udp
               containerPort: 443
               protocol: UDP
-            - name: http-init
+            - name: http-admin
               containerPort: 3000
               protocol: TCP
             - name: dns
@@ -114,7 +114,7 @@ spec:
           readinessProbe:
             httpGet:
               path: {{ .Values.healthCheck.readinessProbe.path | default "/" }}
-              port: http
+              port: http-admin
             initialDelaySeconds: {{ .Values.healthCheck.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.healthCheck.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.healthCheck.readinessProbe.timeoutSeconds }}
@@ -133,12 +133,12 @@ spec:
             timeoutSeconds: {{ .Values.healthCheck.livenessProbe.timeoutSeconds }}
             failureThreshold: {{ .Values.healthCheck.livenessProbe.failureThreshold }}
             successThreshold: {{ .Values.healthCheck.livenessProbe.successThreshold }}
-          {{- if and .Values.healthCheck.startupProbe.enabled (.Capabilities.APIVersions.Has "startupProbe") }}
+          {{- if .Values.healthCheck.startupProbe.enabled }}
           # Startup probe (Kubernetes 1.18+)
           startupProbe:
             httpGet:
               path: {{ .Values.healthCheck.startupProbe.path | default "/" }}
-              port: http
+              port: http-admin
             initialDelaySeconds: {{ .Values.healthCheck.startupProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.healthCheck.startupProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.healthCheck.startupProbe.timeoutSeconds }}
