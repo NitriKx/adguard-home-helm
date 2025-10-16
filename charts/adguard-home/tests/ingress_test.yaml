@@ -48,7 +48,7 @@ tests:
           value: RELEASE-NAME-adguard-home-admin
       - equal:
           path: spec.rules[0].http.paths[0].backend.service.port.number
-          value: 80
+          value: 3000
 
   - it: should render ingress with TLS configuration
     set:

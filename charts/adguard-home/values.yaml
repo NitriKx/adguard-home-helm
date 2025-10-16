@@ -80,10 +80,12 @@ services:
     labels: {}
     ports:
       dns:
+        name: dns
         port: 53
         targetPort: 53
         protocol: UDP
-      dns-tcp:
+      dnsTcp:
+        name: dns-tcp
         port: 53
         targetPort: 53
         protocol: TCP
@@ -95,15 +97,18 @@ services:
     annotations: {}
     labels: {}
     ports:
-      dhcp-server:
+      dhcpServer:
+        name: dhcp-server
         port: 67
         targetPort: 67
         protocol: UDP
-      dhcp-client-tcp:
+      dhcpClientTcp:
+        name: dhcp-client-tcp
         port: 68
         targetPort: 68
         protocol: TCP
-      dhcp-client-udp:
+      dhcpClientUdp:
+        name: dhcp-client-udp
         port: 68
         targetPort: 68
         protocol: UDP
@@ -116,18 +121,22 @@ services:
     labels: {}
     ports:
       http:
+        name: http
         port: 80
         targetPort: 80
         protocol: TCP
       https:
+        name: https
         port: 443
         targetPort: 443
         protocol: TCP
-      https-udp:
+      httpsUdp:
+        name: https-udp
         port: 443
         targetPort: 443
         protocol: UDP
-      http-admin:
+      httpAdmin:
+        name: http-admin
         port: 3000
         targetPort: 3000
         protocol: TCP
@@ -139,7 +148,8 @@ services:
     annotations: {}
     labels: {}
     ports:
-      dns-tls:
+      dnsTls:
+        name: dns-tls
         port: 853
         targetPort: 853
         protocol: TCP
@@ -151,15 +161,18 @@ services:
     annotations: {}
     labels: {}
     ports:
-      dns-quic-784:
+      dnsQuic784:
+        name: dns-quic-784
         port: 784
         targetPort: 784
         protocol: UDP
-      dns-quic-853:
+      dnsQuic853:
+        name: dns-quic-853
         port: 853
         targetPort: 853
         protocol: UDP
-      dns-quic-8853:
+      dnsQuic8853:
+        name: dns-quic-8853
         port: 8853
         targetPort: 8853
         protocol: UDP
@@ -171,11 +184,13 @@ services:
     annotations: {}
     labels: {}
     ports:
-      dnscrypt-tcp:
+      dnscryptTcp:
+        name: dnscrypt-tcp
         port: 5443
         targetPort: 5443
         protocol: TCP
-      dnscrypt-udp:
+      dnscryptUdp:
+        name: dnscrypt-udp
         port: 5443
         targetPort: 5443
         protocol: UDP
