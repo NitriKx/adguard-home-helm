@@ -5,6 +5,10 @@
 # Workload configuration
 workloadType: Deployment  # Deployment or StatefulSet
 replicas: 1
+# Deployment only. AdGuard holds an exclusive lock on sessions.db, so a
+# RollingUpdate deadlocks: the new pod can't start until the old one exits.
+strategy:
+  type: Recreate
 
 # AdGuard Home configuration
 adguardHome:
